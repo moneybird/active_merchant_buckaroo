@@ -4,8 +4,9 @@ module ActiveMerchant
   module Billing
     class BuckarooCreditCardGateway < Gateway
       
+      self.money_format = :cents
       self.supported_cardtypes = [:master, :visa]
-      URL_RECURRING = "https://payment.buckaroo.nl/batch/batch_delivery.asp"
+      URL = "https://payment.buckaroo.nl/batch/batch_delivery.asp"
       
       # ==== Options
       # * <tt>:merchantid</tt> -- The Buckaroo Merchant ID (REQUIRED)
@@ -70,17 +71,17 @@ module ActiveMerchant
         
         # Process response
         doc = Nokogiri.XML(response)
-        statuscode = doc.at('/PayMessage/Content/BatchDelivery/ResponseStatus').inner_text
+        response_status = doc.at('/PayMessage/Content/BatchDelivery/ResponseStatus').inner_text
         message = doc.at('/PayMessage/Content/BatchDelivery/AdditionalMessage').inner_text
-        if statuscode == "700"
-          return BuckarooCreditCardRecurringResponse.new(true, "", { :xml_received => response, :xml_sent => xml })
+        if response_status == "700"
+          return ActiveMerchant::Billing::BuckarooCreditCardRecurringResponse.new(true, "", { :xml_received => response, :xml_sent => xml })
         else
-          return BuckarooCreditCardRecurringResponse.new(false, message, { :xml_received => response, :xml_sent => xml })
+          return ActiveMerchant::Billing::BuckarooCreditCardRecurringResponse.new(false, message, { :xml_received => response, :xml_sent => xml })
         end
       end
       
       def commit(xml)
-        uri   = URI.parse(URL_RECURRING)
+        uri   = URI.parse(URL)
         http  = Net::HTTP.new(uri.host, uri.port)
         http.use_ssl = (uri.scheme == 'https')
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ActiveMerchant::Billing::Base.test?

@@ -10,6 +10,9 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
     lambda {
       ActiveMerchant::Billing::BuckarooCreditCardGateway.new(:merchantid => "1234")
     }.should raise_error(ArgumentError)
+  end
+  
+  it "should throw an error if a gateway is created without merchantid or secretkey" do
     lambda {
       ActiveMerchant::Billing::BuckarooCreditCardGateway.new(:secretkey => "1234")
     }.should raise_error(ArgumentError)
@@ -22,6 +25,7 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
       @secretkey    = "secretkey"
       @gateway      = ActiveMerchant::Billing::BuckarooCreditCardGateway.new(:merchantid => @merchantid, :secretkey => @secretkey)
       
+      @amount       = 1000
       @batchid      = "1"
       @customerid   = "company_1"
       @description  = "Description"
@@ -43,7 +47,7 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
             <Time>16:01:17</Time>
             <MerchantID>merchantid</MerchantID>
             <BatchID>1</BatchID>
-      	    <Signature>0a777a50f8d13101f6ef666287039544</Signature>
+      	    <Signature>signature</Signature>
             <MessageID>BatchDeliveryResponse</MessageID>
           </Control>
           <Content>
@@ -70,7 +74,7 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
       </PayMessage>')
       http_mock.should_receive(:post).and_return(response_mock)
       
-      @response = @gateway.recurring(1000, nil, {
+      @response = @gateway.recurring(@amount, nil, {
         :batchid      => @batchid,
         :customerid   => @customerid,
         :description  => @description,
@@ -78,10 +82,17 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
         :responseurl  => @responseurl
       })
       
+      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooCreditCardRecurringResponse)
       @response.success?.should == true
       
-      doc = Nokogiri.XML(@response.xml_received)
-      doc.search('/PayMessage/Content/BatchDelivery/AdditionalMessage/ResponseURL').first.inner_text.should == @responseurl      
+      doc1 = Nokogiri.XML(@response.xml_sent)
+      doc1.search('/PayMessage/Content/Transaction/Amount').first.inner_text.should == @amount.to_s
+      doc1.search('/PayMessage/Content/Transaction/CustomerID').first.inner_text.should == @customerid
+      doc1.search('/PayMessage/Content/Transaction/Description').first.inner_text.should == @description
+      doc1.search('/PayMessage/Content/Transaction/Invoice').first.inner_text.should == @invoice
+
+      doc2 = Nokogiri.XML(@response.xml_received)
+      doc2.search('/PayMessage/Content/BatchDelivery/AdditionalMessage/ResponseURL').first.inner_text.should == @responseurl
     end
   end
 end

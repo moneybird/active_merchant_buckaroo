@@ -76,18 +76,23 @@ module ActiveMerchant
         response = commit(xml)
         
         doc = Nokogiri.XML(response)
-        response_status = doc.at('Payload/Content/Transaction/ResponseStatus').inner_text
-        message = doc.at('Payload/Content/Transaction/AdditionalMessage').inner_text
-        if response_status == "600"
-          return ActiveMerchant::Billing::BuckarooDirectDebitPurchaseResponse.new(true, "", { :response_status => response_status, :xml_received => response, :xml_sent => xml })
+        if doc.at('Payload/Content/Transaction/ResponseStatus')
+          response_status = doc.at('Payload/Content/Transaction/ResponseStatus').inner_text
+          message = doc.at('Payload/Content/Transaction/AdditionalMessage').inner_text
+          if response_status == "600"
+            return ActiveMerchant::Billing::BuckarooDirectDebitPurchaseResponse.new(true, "", { :response_status => response_status, :xml_received => response, :xml_sent => xml })
+          else
+            return ActiveMerchant::Billing::BuckarooDirectDebitPurchaseResponse.new(false, message, { :response_status => response_status, :xml_received => response, :xml_sent => xml })
+          end
         else
           return ActiveMerchant::Billing::BuckarooDirectDebitPurchaseResponse.new(false, message, { :response_status => response_status, :xml_received => response, :xml_sent => xml })
         end
       end
 
       def commit(xml)
-        uri   = URI.parse(URL)
-        http  = Net::HTTP.new(uri.host, uri.port)
+        uri = URI.parse(URL)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.read_timeout = 300
         http.use_ssl = (uri.scheme == 'https')
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ActiveMerchant::Billing::Base.test?
         http.post(uri.request_uri, xml, { 'Content-Type' => 'text/xml; charset=utf-8' }).body

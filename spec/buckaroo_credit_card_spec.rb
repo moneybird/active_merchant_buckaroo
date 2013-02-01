@@ -35,6 +35,7 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
     
     it "should create a new recurring via the Buckaroo API" do
       http_mock = mock(Net::HTTP)      
+      http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("payment.buckaroo.nl", 443).and_return(http_mock)
       
@@ -47,7 +48,7 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
             <Time>16:01:17</Time>
             <MerchantID>merchantid</MerchantID>
             <BatchID>1</BatchID>
-      	    <Signature>signature</Signature>
+            <Signature>signature</Signature>
             <MessageID>BatchDeliveryResponse</MessageID>
           </Control>
           <Content>
@@ -58,15 +59,15 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
                 <Info>ok</Info>
                 <BatchKey></BatchKey>
                 <Schedule>
-        	        <Date>2012-07-05</Date>
-        	        <Time>16:02:17</Time>
+                  <Date>2012-07-05</Date>
+                  <Time>16:02:17</Time>
                 </Schedule>
                 <ResponseURL>http://www.example.com/buckaroo/return</ResponseURL>
                 <Transactions>1</Transactions>
                 <Duration validation="estimate" unit="seconds">60</Duration>
                 <ETR>
-        	        <Date>2012-07-05</Date>
-        	        <Time>17:02:17</Time>
+                  <Date>2012-07-05</Date>
+                  <Time>17:02:17</Time>
                 </ETR>
               </AdditionalMessage>
             </BatchDelivery>
@@ -93,6 +94,30 @@ describe "Buckaroo Credit Card implementation for ActiveMerchant" do
 
       doc2 = Nokogiri.XML(@response.xml_received)
       doc2.search('/PayMessage/Content/BatchDelivery/AdditionalMessage/ResponseURL').first.inner_text.should == @responseurl
+    end
+
+    it "should still work with empty response" do
+      http_mock = mock(Net::HTTP)      
+      http_mock.should_receive(:read_timeout=).once.with(300)
+      http_mock.should_receive(:use_ssl=).once.with(true)
+      Net::HTTP.should_receive(:new).with("payment.buckaroo.nl", 443).and_return(http_mock)
+      
+      response_mock = mock(Net::HTTPResponse)
+      response_mock.should_receive(:body).and_return('')
+      http_mock.should_receive(:post).and_return(response_mock)
+      
+      @response = @gateway.recurring(@amount, nil, {
+        :batchid      => @batchid,
+        :customerid   => @customerid,
+        :description  => @description,
+        :invoice      => @invoice,
+        :responseurl  => @responseurl
+      })
+      
+      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooCreditCardRecurringResponse)
+      @response.success?.should == false
+      @response.response_status.should == nil
+      @response.xml_received.should == ""
     end
   end
 end

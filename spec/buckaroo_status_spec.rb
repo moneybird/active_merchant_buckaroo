@@ -35,6 +35,7 @@ describe "Buckaroo Status implementation for ActiveMerchant" do
     it "should create a new purchase via the Buckaroo API" do
 
       http_mock = mock(Net::HTTP)      
+      http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("payment.buckaroo.nl", 443).and_return(http_mock)
       

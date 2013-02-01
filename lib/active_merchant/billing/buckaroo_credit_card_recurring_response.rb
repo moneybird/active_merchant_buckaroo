@@ -10,6 +10,10 @@ module ActiveMerchant #:nodoc:
         @params['xml_sent']
       end
       
+      def response_status
+        @params['response_status']
+      end      
+
     end
   end
 end

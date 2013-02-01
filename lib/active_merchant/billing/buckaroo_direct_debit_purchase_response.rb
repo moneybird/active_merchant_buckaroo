@@ -13,6 +13,7 @@ module ActiveMerchant #:nodoc:
       def response_status
         @params['response_status']
       end      
+
     end
   end
 end

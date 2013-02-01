@@ -72,8 +72,9 @@ module ActiveMerchant
       end
 
       def commit(xml)
-        uri   = URI.parse(URL)
-        http  = Net::HTTP.new(uri.host, uri.port)
+        uri = URI.parse(URL)
+        http = Net::HTTP.new(uri.host, uri.port)
+        http.read_timeout = 300
         http.use_ssl = (uri.scheme == 'https')
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ActiveMerchant::Billing::Base.test?
         http.post(uri.request_uri, xml, { 'Content-Type' => 'text/xml; charset=utf-8' }).body

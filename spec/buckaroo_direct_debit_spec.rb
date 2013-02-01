@@ -39,6 +39,7 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
     it "should create a new purchase via the Buckaroo API" do
 
       http_mock = mock(Net::HTTP)      
+      http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("payment.buckaroo.nl", 443).and_return(http_mock)
       
@@ -120,6 +121,34 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
       doc2.at('Payload/Content/Transaction/Reference').inner_text.should == @reference
       doc2.at('Payload/Content/Transaction/ResponseStatus').inner_text.should == "600"
       doc2.at('Payload/Content/Transaction/TransactionKey').inner_text.should == "transactionkey"
+    end
+
+    it "should still work with empty response" do
+
+      http_mock = mock(Net::HTTP)      
+      http_mock.should_receive(:read_timeout=).once.with(300)
+      http_mock.should_receive(:use_ssl=).once.with(true)
+      Net::HTTP.should_receive(:new).with("payment.buckaroo.nl", 443).and_return(http_mock)
+      
+      response_mock = mock(Net::HTTPResponse)
+      response_mock.should_receive(:body).and_return('')
+      http_mock.should_receive(:post).and_return(response_mock)
+      
+      @response = @gateway.purchase(@amount, nil, {
+        :accountname    => @accountname,
+        :accountnumber  => @accountnumber,
+        :description    => @description,
+        :email          => @email,
+        :firstname      => @firstname,
+        :invoice        => @invoice,
+        :lastname       => @lastname,
+        :reference      => @reference
+      })
+      
+      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooDirectDebitPurchaseResponse)
+      @response.success?.should == false
+      @response.response_status.should == nil
+      @response.xml_received.should == ""
     end
   end
 end

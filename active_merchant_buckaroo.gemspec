@@ -3,10 +3,10 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = %q{active_merchant_buckaroo}
-  s.version     = "0.0.4"
+  s.version     = "0.0.5"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Berend"]
-  s.email       = ["info@bluetools.nl"]
+  s.email       = ["info@moneybird.com"]
   s.homepage    = ""
   s.summary     = %q{ActiveMerchant extension to support the Dutch PSP Buckaroo}
   s.description = %q{ActiveMerchant extension to support the Dutch PSP Buckaroo}
@@ -18,5 +18,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency('activemerchant')
   s.add_dependency('nokogiri')
+  s.add_dependency('rack')
   s.add_dependency('rspec')
 end

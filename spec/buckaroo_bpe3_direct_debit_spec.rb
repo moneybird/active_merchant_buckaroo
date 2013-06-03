@@ -34,8 +34,8 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
     
     context "ArgumentErrors" do
 
-      it "should raise an ArumentError when string length of accountname is more than 20" do
-        @accountname = "AAAAABBBBBCCCCCDDDDDE"
+      it "should raise an ArumentError when string length of accountname is more than 40" do
+        @accountname = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
         lambda {
           @gateway.purchase(@amount, nil, {
@@ -58,8 +58,8 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
           }) }.should raise_error(ArgumentError)
       end
 
-      it "should raise an ArumentError when string length of description is more than 20" do
-        @description = "AAAAABBBBBCCCCCDDDDDE"
+      it "should raise an ArumentError when string length of description is more than 40" do
+        @description = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
         lambda {
           @gateway.purchase(@amount, nil, {
@@ -70,8 +70,8 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
           }) }.should raise_error(ArgumentError)
       end
 
-      it "should raise an ArumentError when string length of invoicenumber is more than 12" do
-        @invoicenumber = "AAAAABBBBBCCC"
+      it "should raise an ArumentError when string length of invoicenumber is more than 40" do
+        @invoicenumber = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
         lambda {
           @gateway.purchase(@amount, nil, {

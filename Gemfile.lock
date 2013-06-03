@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_merchant_buckaroo (0.0.6)
+    active_merchant_buckaroo (0.0.7)
       activemerchant
       nokogiri
       rack

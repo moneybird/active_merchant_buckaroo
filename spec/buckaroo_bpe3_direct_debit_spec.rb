@@ -70,8 +70,8 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
           }) }.should raise_error(ArgumentError)
       end
 
-      it "should raise an ArumentError when string length of invoicenumber is more than 10" do
-        @invoicenumber = "AAAAABBBBBC"
+      it "should raise an ArumentError when string length of invoicenumber is more than 12" do
+        @invoicenumber = "AAAAABBBBBCCC"
 
         lambda {
           @gateway.purchase(@amount, nil, {

@@ -23,7 +23,7 @@ module ActiveMerchant
         raise ArgumentError.new("accountname should be max 20 chars long") if options[:accountname].size > 20
         raise ArgumentError.new("accountnumber should be max 9 chars long") if options[:accountnumber].size > 9
         raise ArgumentError.new("description should be max 20 chars long") if options[:description].size > 20
-        raise ArgumentError.new("invoicenumber should be max 10 chars long") if options[:invoicenumber].size > 10
+        raise ArgumentError.new("invoicenumber should be max 12 chars long") if options[:invoicenumber].size > 12
 
         recurring = options[:recurring] || false
 

@@ -30,6 +30,15 @@ describe "Buckaroo BPE3 Toolbox" do
     it "should create a valid signature" do
       ActiveMerchant::Billing::BuckarooBPE3Toolbox.create_signature(@params, @secretkey).should == "ed6646396c285a6f9285ca29af4e78f3535f2fdb"
     end
+
+    it "should sort the hash for signatures the right way (case insensitive)" do
+      # should sort hash this way:
+      # [["brq_a", 1], ["brq_B", 2], ["brq_c", 3]]
+      # and not
+      # [["brq_B", 2], ["brq_a", 1], ["brq_c", 3]]
+      params = { "brq_a" => 1, "brq_B" => 2, "brq_c" => 3 }
+      ActiveMerchant::Billing::BuckarooBPE3Toolbox.create_signature(params, @secretkey).should == "70352f4dd3c2ebe775ab2f046f8a4e34fef4a98c"
+    end
     
     it "should correctly check a signature" do
       str = "BRQ_AMOUNT=1.23&BRQ_APIRESULT=Pending&BRQ_CURRENCY=EUR&BRQ_INVOICENUMBER=2013-0001&BRQ_PAYMENT=1234567890ABCDEFGHIJKLMNOPQRSTUV&BRQ_PAYMENT_METHOD=directdebit&BRQ_STATUSCODE=791&BRQ_STATUSMESSAGE=Pending+processing&BRQ_TEST=false&BRQ_TIMESTAMP=2013-03-19+15%3a02%3a08&BRQ_TRANSACTIONS=1234567890ABCDEFGHIJKLMNOPQRSTUV&BRQ_SIGNATURE=dee5c83c666c9837051182d6d8866d2c1e5eb446"

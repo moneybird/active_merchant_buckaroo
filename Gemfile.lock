@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_merchant_buckaroo (0.0.8)
+    active_merchant_buckaroo (0.0.9)
       activemerchant
       nokogiri
       rack
@@ -28,9 +28,9 @@ GEM
     diff-lcs (1.2.4)
     i18n (0.6.4)
     json (1.8.0)
-    money (5.1.0)
+    money (5.1.1)
       i18n (~> 0.6.0)
-    multi_json (1.7.5)
+    multi_json (1.7.7)
     nokogiri (1.5.6)
     rack (1.5.2)
     rspec (2.13.0)

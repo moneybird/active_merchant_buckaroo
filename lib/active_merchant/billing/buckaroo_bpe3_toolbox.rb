@@ -3,8 +3,12 @@ module ActiveMerchant
     class BuckarooBPE3Toolbox
 
       def self.check_signature(params, secretkey)
-        signature = params.delete("BRQ_SIGNATURE") || params.delete("brq_signature")
-        signature == BuckarooBPE3Toolbox.create_signature(params, secretkey)
+        signature = params["brq_signature"] || params["BRQ_SIGNATURE"]
+        new_params = {}
+        params.each do |k,v|
+          new_params[k] = v if k.kind_of?(String) and k.downcase != "brq_signature"
+        end
+        signature == BuckarooBPE3Toolbox.create_signature(new_params, secretkey)
       end
 
       def self.create_post_data(params, signature)
@@ -13,7 +17,10 @@ module ActiveMerchant
 
       def self.create_signature(params, secretkey)
         str_sig = params.sort.map{|k,v| "#{k}=#{v}"}.join
-        Digest::SHA1.hexdigest(str_sig + secretkey)
+        sig = Digest::SHA1.hexdigest(str_sig + secretkey)
+        # TODO
+        # puts sig
+        sig
       end
       
       def self.commit(url, post_data)
@@ -24,6 +31,21 @@ module ActiveMerchant
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ActiveMerchant::Billing::Base.test?
         http.post(uri.request_uri, post_data, { 'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8' }).body
       end
+
+      def self.hash_to_downcase_keys(the_hash)
+        new_hash = {}
+        the_hash.each do |key, value|
+          if key.kind_of?(String)
+            new_hash[key.downcase] = value
+          else
+            new_hash[key] = value
+          end
+        end
+        new_hash
+      end
+
     end
+
   end
+
 end

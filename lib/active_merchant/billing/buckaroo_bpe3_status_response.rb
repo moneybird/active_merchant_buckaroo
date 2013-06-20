@@ -18,6 +18,11 @@ module ActiveMerchant #:nodoc:
         @params['statuscode']
       end
 
+
+      def test?
+        response_params['BRQ_TEST'] == "true"
+      end
+
     end
   end
 end

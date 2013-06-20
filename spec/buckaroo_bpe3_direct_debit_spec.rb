@@ -102,12 +102,12 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
         :invoicenumber  => @invoicenumber
       })
       
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3DirectDebitPurchaseResponse)
+      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
+      @response.response_data.should_not == ""
       @response.success?.should == true
       @response.statuscode.should == "791"
-      @response.response_data.should_not == ""
-      @response.response_params["BRQ_AMOUNT"].should == @amount.to_s
-      @response.response_params["BRQ_INVOICENUMBER"].should == @invoicenumber
+      @response.amount.should == @amount.to_s
+      @response.invoicenumber.should == @invoicenumber
       
       @response.post_params.should_not == nil
       @response.post_params[:brq_amount].should == @amount
@@ -126,7 +126,7 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
       
       response_mock = mock(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return('')
+      response_mock.should_receive(:body).and_return("")
       http_mock.should_receive(:post).and_return(response_mock)
       
       @response = @gateway.purchase(@amount, nil, {
@@ -154,7 +154,7 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
       
       response_mock = mock(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return('')
+      response_mock.should_receive(:body).and_return("")
       http_mock.should_receive(:post).and_return(response_mock)
       
       @response = @gateway.purchase(@amount, nil, {
@@ -164,10 +164,10 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
         :invoicenumber  => @invoicenumber,
       })
       
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3DirectDebitPurchaseResponse)
+      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.success?.should == false
       @response.statuscode.should == nil
-      @response.response_data.should == nil
+      @response.response_data.should == ""
     end
 
     it "should still work with crappy response" do
@@ -178,7 +178,7 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
       
       response_mock = mock(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return('this is a very nasty response')
+      response_mock.should_receive(:body).and_return("this is a very nasty response")
       http_mock.should_receive(:post).and_return(response_mock)
       
       @response = @gateway.purchase(@amount, nil, {
@@ -188,7 +188,7 @@ describe "Buckaroo Direct Debit implementation for ActiveMerchant" do
         :invoicenumber  => @invoicenumber,
       })
       
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3DirectDebitPurchaseResponse)
+      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.success?.should == false
       @response.statuscode.should == nil
       @response.response_data.should == "this is a very nasty response"

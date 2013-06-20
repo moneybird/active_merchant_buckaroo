@@ -15,10 +15,10 @@ module ActiveMerchant
         super
       end
 
-      def status_for_invoicenumber(options)
+      def status_for_invoicenumber(options = {})
         requires!(options, :invoicenumber)
 
-        raise ArgumentError.new("invoicenumber should be max 20 chars long") if options[:invoicenumber].size > 20
+        raise ArgumentError.new("invoicenumber should be max 40 chars long") if options[:invoicenumber].size > 40
 
         # make sure this is in alphabetical order and without signature
         post_params = {

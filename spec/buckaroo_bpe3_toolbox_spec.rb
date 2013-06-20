@@ -36,6 +36,19 @@ describe "Buckaroo BPE3 Toolbox" do
       
       params = Rack::Utils.parse_query(str)
       ActiveMerchant::Billing::BuckarooBPE3Toolbox.check_signature(params, @secretkey).should == true
+      # make sure the BRQ_SIGNATURE is not deleted from the original hash
+      params["BRQ_SIGNATURE"].should == "dee5c83c666c9837051182d6d8866d2c1e5eb446"
+    end
+
+    it "should downcase the keys in hash" do
+
+      params = { "BRQ_AMOUNT" => "1.23", "BRQ_TEST" => "true" }
+      result = ActiveMerchant::Billing::BuckarooBPE3Toolbox.hash_to_downcase_keys(params)
+
+      result["BRQ_AMOUNT"].should == nil
+      result["brq_amount"].should == "1.23"
+      result["BRQ_TEST"].should == nil
+      result["brq_test"].should == "true"
     end
 
   end

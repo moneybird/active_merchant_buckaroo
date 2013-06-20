@@ -16,7 +16,7 @@ module ActiveMerchant
       end
 
       def self.create_signature(params, secretkey)
-        str_sig = params.sort.map{|k,v| "#{k}=#{v}"}.join
+        str_sig = params.sort_by { |f| f.first.downcase }.map{|k,v| "#{k}=#{v}"}.join
         sig = Digest::SHA1.hexdigest(str_sig + secretkey)
         # TODO
         # puts sig

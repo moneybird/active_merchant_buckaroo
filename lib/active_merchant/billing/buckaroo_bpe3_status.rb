@@ -16,6 +16,7 @@ module ActiveMerchant
       end
 
       def status_for_invoicenumber(options = {})
+        requires!(options, :amount_invoice)
         requires!(options, :invoicenumber)
 
         raise ArgumentError.new("invoicenumber should be max 40 chars long") if options[:invoicenumber].size > 40
@@ -30,14 +31,20 @@ module ActiveMerchant
         post_data = ActiveMerchant::Billing::BuckarooBPE3Toolbox.create_post_data(post_params, brq_signature)
 
         response_data = ActiveMerchant::Billing::BuckarooBPE3Toolbox.commit(@options[:url], post_data)
-        if !response_data.blank?
-          response_params = Rack::Utils.parse_query(response_data)
-          puts response_params.inspect
-          
-          check = ActiveMerchant::Billing::BuckarooBPE3Toolbox.check_signature(response_params, @options[:secretkey])
-          puts check
-          
-          # TODO WORK IN PROGRESS
+        # puts response_data
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(response_data, @options[:secretkey])
+        return_params = { 
+          post_data: post_data,
+          post_params: post_params,
+          response_parser: response_parser,
+          amount_invoice: options[:amount_invoice]
+        }
+
+        if response_parser.valid?
+          success = response_parser.response_params["brq_apiresult"].downcase == "success"
+          return ActiveMerchant::Billing::BuckarooBPE3Response.new(success, response_parser.statusmessage, return_params)
+        else
+          return ActiveMerchant::Billing::BuckarooBPE3Response.new(false, "Invalid response", return_params)
         end
 
       end

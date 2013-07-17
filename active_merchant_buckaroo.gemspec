@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = %q{active_merchant_buckaroo}
-  s.version     = "0.0.9"
+  s.version     = "0.1.0"
   s.platform    = Gem::Platform::RUBY
   s.authors     = ["Berend"]
   s.email       = ["info@moneybird.com"]
@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency('activemerchant')
+  s.add_dependency('bigdecimal')
   s.add_dependency('nokogiri')
   s.add_dependency('rack')
   s.add_dependency('rspec')

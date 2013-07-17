@@ -43,6 +43,41 @@ module ActiveMerchant #:nodoc:
         response_parser.test?
       end
 
+
+      # bpe3 status
+      def status_amount_credit
+        amount = BigDecimal.new("0")
+        1.upto(99) do |i|
+          str = sprintf("brq_invoice_1_transactions_%d_amountcredit", i)
+          amount += BigDecimal.new(response_params[str]) if response_params[str]
+        end
+        amount
+      end
+
+      def status_amount_debit
+        amount = BigDecimal.new("0")
+        1.upto(99) do |i|
+          str1 = sprintf("brq_invoice_1_transactions_%d_amountdebit", i)
+          str2 = sprintf("brq_invoice_1_transactions_%d_status_success", i)
+          if response_params[str1] and response_params[str2] and response_params[str2].downcase == "true"
+            amount += BigDecimal.new(response_params[str1])
+          end
+        end
+        amount
+      end
+
+      def status_amount_invoice
+        BigDecimal.new(@params["amount_invoice"].to_s)
+      end
+
+      def status_amount_paid
+        (status_amount_debit - status_amount_credit)
+      end
+
+      def status_paid?
+        status_amount_paid == status_amount_invoice
+      end
+
     end
 
   end

@@ -16,7 +16,8 @@ module ActiveMerchant
       end
 
       def self.create_signature(params, secretkey)
-        str_sig = params.sort_by { |f| f.first.downcase }.map{|k,v| "#{k}=#{v}"}.join
+        sorted_params = ActiveMerchant::Billing::BuckarooBPE3Toolbox.sort_hash(params)
+        str_sig = sorted_params.map{|k,v| "#{k}=#{v}"}.join
         sig = Digest::SHA1.hexdigest(str_sig + secretkey)
         # TODO
         # puts sig
@@ -30,6 +31,10 @@ module ActiveMerchant
         http.use_ssl = (uri.scheme == 'https')
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ActiveMerchant::Billing::Base.test?
         http.post(uri.request_uri, post_data, { 'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8' }).body
+      end
+
+      def self.sort_hash(params)
+        params.sort_by { |f| f.first.downcase }
       end
 
       def self.hash_to_downcase_keys(the_hash)

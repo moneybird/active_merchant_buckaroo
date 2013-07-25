@@ -37,7 +37,16 @@ describe "Buckaroo BPE3 Toolbox" do
       # and not
       # [["brq_B", 2], ["brq_a", 1], ["brq_c", 3]]
       params = { "brq_a" => 1, "brq_B" => 2, "brq_c" => 3 }
-      ActiveMerchant::Billing::BuckarooBPE3Toolbox.create_signature(params, @secretkey).should == "70352f4dd3c2ebe775ab2f046f8a4e34fef4a98c"
+      ActiveMerchant::Billing::BuckarooBPE3Toolbox.sort_hash(params).should == [["brq_a", 1], ["brq_B", 2], ["brq_c", 3]]
+    end
+    
+    it "should sort the hash for signatures the right way (integer followed by string in string)" do
+      # should sort hash this way:
+      # [["brq_1_id", 1], ["brq_10_id", 1], ["brq_2_id", 1]]
+      # and not
+      # [["brq_10_id", 1], ["brq_1_id", 1], ["brq_2_id", 1]]
+      params = { "brq_1_id" => 1, "brq_10_id" => 1, "brq_2_id" => 1 }
+      ActiveMerchant::Billing::BuckarooBPE3Toolbox.sort_hash(params).should == [["brq_1_id", 1], ["brq_10_id", 1], ["brq_2_id", 1]]
     end
     
     it "should correctly check a signature" do

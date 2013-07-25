@@ -86,6 +86,10 @@ module ActiveMerchant #:nodoc:
       end
 
 
+      def creditcard?
+        mastercard? or visa?
+      end
+
       def directdebit?
         # Only for BuckarooBPE3Push, not for BuckarooBPE3Response
         transaction_type.upcase == "C002"
@@ -98,6 +102,10 @@ module ActiveMerchant #:nodoc:
 
       def failure?
         [ "490", "491", "492", "690", "890", "891" ].include?(statuscode)
+      end
+
+      def mastercard?
+        transaction_type.upcase == "V043"
       end
 
       def pending?
@@ -123,6 +131,10 @@ module ActiveMerchant #:nodoc:
 
       def valid?
         @signature_valid
+      end
+
+      def visa?
+        transaction_type.upcase == "V044"
       end
 
     end

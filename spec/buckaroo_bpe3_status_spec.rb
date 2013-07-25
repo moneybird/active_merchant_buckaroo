@@ -201,6 +201,37 @@ describe "Buckaroo Status implementation for ActiveMerchant" do
       @response.post_params[:brq_invoicenumber].should == @invoicenumber
     end
 
+    it "should return a descent response for an invoice doesnt exist" do
+
+      http_mock = mock(Net::HTTP)
+      http_mock.should_receive(:read_timeout=).once.with(300)
+      http_mock.should_receive(:use_ssl=).once.with(true)
+      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
+      
+      response_mock = mock(Net::HTTPResponse)
+      response_mock.should_receive(:body).and_return('BRQ_APIRESULT=Success&BRQ_INVALIDINVOICE_1_ERRORMESSAGE=Invoice+could+not+be+found&BRQ_INVALIDINVOICE_1_NUMBER=2013-0001&BRQ_SIGNATURE=9e75938f7292beb83b3ada7b52228c77b2efa6f5')
+      http_mock.should_receive(:post).and_return(response_mock)
+      
+      @response = @gateway.status_for_invoicenumber({
+        amount_invoice: @amount_invoice,
+        invoicenumber:  @invoicenumber
+      })
+      
+      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
+      @response.success?.should == true
+      @response.test?.should == false
+      @response.status_paid?.should == false
+
+      @response.response_parser.valid?.should == true
+
+      @response.status_amount_paid.should == 0
+
+      @response.response_data.should_not == ""
+
+      @response.post_params.should_not == nil
+      @response.post_params[:brq_invoicenumber].should == @invoicenumber
+    end
+
     it "should still work with empty response" do
 
       http_mock = mock(Net::HTTP)      

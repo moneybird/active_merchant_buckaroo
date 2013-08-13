@@ -51,6 +51,16 @@ describe "Buckaroo Response And Push Parser" do
     end
 
 
+    it "should parse a push correctly - brq_transaction_method - 1 - transfer" do
+      params = { "brq_transaction_type" => "C001" }
+      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+      response_parser.creditcard?.should == false
+      response_parser.directdebit?.should == false
+      response_parser.directdebitrecurring?.should == false
+      response_parser.reversal?.should == false
+      response_parser.transfer?.should == true
+    end
+
     it "should parse a push correctly - brq_transaction_method - 1 - directdebit" do
       params = { "brq_transaction_type" => "C002" }
       response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
@@ -58,6 +68,7 @@ describe "Buckaroo Response And Push Parser" do
       response_parser.directdebit?.should == true
       response_parser.directdebitrecurring?.should == false
       response_parser.reversal?.should == false
+      response_parser.transfer?.should == false
     end
 
     it "should parse a push correctly - brq_transaction_method - 2 - directdebitrecurring" do
@@ -67,6 +78,7 @@ describe "Buckaroo Response And Push Parser" do
       response_parser.directdebit?.should == false
       response_parser.directdebitrecurring?.should == true
       response_parser.reversal?.should == false
+      response_parser.transfer?.should == false
     end
 
     it "should parse a push correctly - brq_transaction_method - 3 - reversal" do
@@ -76,6 +88,7 @@ describe "Buckaroo Response And Push Parser" do
       response_parser.directdebit?.should == false
       response_parser.directdebitrecurring?.should == false
       response_parser.reversal?.should == true
+      response_parser.transfer?.should == false
     end
 
     it "should parse a push correctly - brq_transaction_method - 4 - mastercard" do
@@ -86,6 +99,7 @@ describe "Buckaroo Response And Push Parser" do
       response_parser.directdebitrecurring?.should == false
       response_parser.mastercard?.should == true
       response_parser.reversal?.should == false
+      response_parser.transfer?.should == false
       response_parser.visa?.should == false
     end
 
@@ -97,6 +111,7 @@ describe "Buckaroo Response And Push Parser" do
       response_parser.directdebitrecurring?.should == false
       response_parser.mastercard?.should == false
       response_parser.reversal?.should == false
+      response_parser.transfer?.should == false
       response_parser.visa?.should == true
     end
 

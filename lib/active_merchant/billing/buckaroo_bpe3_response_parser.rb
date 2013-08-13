@@ -129,6 +129,10 @@ module ActiveMerchant #:nodoc:
         test.downcase == "true"
       end
 
+      def transfer?
+        transaction_type.upcase == "C001"
+      end
+
       def valid?
         @signature_valid
       end

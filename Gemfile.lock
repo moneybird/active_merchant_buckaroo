@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_merchant_buckaroo (0.1.4)
+    active_merchant_buckaroo (0.1.5)
       activemerchant
       bigdecimal
       nokogiri

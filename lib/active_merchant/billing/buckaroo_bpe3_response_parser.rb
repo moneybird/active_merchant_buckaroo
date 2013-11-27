@@ -28,12 +28,28 @@ module ActiveMerchant #:nodoc:
         response_params["brq_amount"]
       end
 
+      def apiresult
+        response_params["brq_apiresult"] || ""
+      end
+
+      def bic
+        response_params["brq_bic"]
+      end
+
       def cardnumberending
         response_params["brq_service_mastercard_cardnumberending"] || response_params["brq_service_visa_cardnumberending"]
       end
 
       def currency
         response_params["brq_currency"]
+      end
+
+      def error
+        response_params["brq_error"] || ""
+      end
+
+      def iban
+        response_params["brq_iban"]
       end
 
       def invoicenumber
@@ -86,6 +102,10 @@ module ActiveMerchant #:nodoc:
       end
 
 
+      def apiresult_success?
+        apiresult.downcase == "success"
+      end
+
       def creditcard?
         mastercard? or visa?
       end
@@ -102,6 +122,10 @@ module ActiveMerchant #:nodoc:
 
       def failure?
         [ "490", "491", "492", "690", "890", "891" ].include?(statuscode)
+      end
+
+      def iban_converter_success?
+        error.blank?
       end
 
       def mastercard?

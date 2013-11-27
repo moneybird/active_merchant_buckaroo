@@ -27,6 +27,18 @@ module ActiveMerchant #:nodoc:
         response_parser.amount
       end
 
+      def bic
+        response_parser.bic
+      end
+
+      def iban
+        response_parser.iban
+      end
+
+      def iban_converter_success?
+        response_parser.iban_converter_success?
+      end
+
       def invoicenumber
         response_parser.invoicenumber
       end

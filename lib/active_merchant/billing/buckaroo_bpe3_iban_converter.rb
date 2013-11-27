@@ -46,7 +46,7 @@ module ActiveMerchant
         }
 
         if response_parser.valid?
-          success = response_parser.success?
+          success = response_parser.apiresult_success?
           return ActiveMerchant::Billing::BuckarooBPE3Response.new(success, response_parser.statusmessage, return_params)
         else
           return ActiveMerchant::Billing::BuckarooBPE3Response.new(false, "Invalid response", return_params)

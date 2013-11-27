@@ -146,7 +146,7 @@ module ActiveMerchant #:nodoc:
       end
 
       def success?
-        statuscode == "190" or apiresult_success?
+        statuscode == "190"
       end
 
       def test?

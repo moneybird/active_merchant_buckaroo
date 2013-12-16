@@ -24,10 +24,10 @@ module ActiveMerchant
         sig
       end
       
-      def self.commit(url, post_data)
+      def self.commit(url, post_data, read_timeout = 300)
         uri = URI.parse(url)
         http = Net::HTTP.new(uri.host, uri.port)
-        http.read_timeout = 300
+        http.read_timeout = read_timeout
         http.use_ssl = (uri.scheme == 'https')
         http.verify_mode = OpenSSL::SSL::VERIFY_NONE if ActiveMerchant::Billing::Base.test?
         http.post(uri.request_uri, post_data, { 'Content-Type' => 'application/x-www-form-urlencoded; charset=utf-8' }).body

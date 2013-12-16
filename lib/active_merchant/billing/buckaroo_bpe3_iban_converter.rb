@@ -48,9 +48,8 @@ module ActiveMerchant
         end
 
         if bic.blank?
-          resp = convert_to_iban(options)
+          resp = convert_to_iban({ accountnumber: accountnumber[8..-1], countryisocode: countryisocode })
           if resp.success?
-            p "hallo"
             bic = resp.bic
           else
             raise "bic_for_iban: convertion to bic failed"

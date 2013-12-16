@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_merchant_buckaroo (0.1.5)
+    active_merchant_buckaroo (0.1.6)
       activemerchant
       bigdecimal
       nokogiri
@@ -29,10 +29,10 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.37)
     atomic (1.1.13)
-    bigdecimal (1.2.1)
+    bigdecimal (1.2.3)
     builder (3.1.4)
     diff-lcs (1.2.4)
-    i18n (0.6.5)
+    i18n (0.6.8)
     json (1.8.1)
     mini_portile (0.5.2)
     minitest (4.7.5)

@@ -138,11 +138,16 @@ module ActiveMerchant #:nodoc:
 
       def reversal?
         # Only for BuckarooBPE3Push, not for BuckarooBPE3Response
-        transaction_type.upcase == "C562"
+        # C562 is for directdebit and C501 for simplesepadirectdebit
+        ["C501", "C562"].include?(transaction_type.upcase)
       end
 
       def signature_valid?
         @signature_valid
+      end
+
+      def simplesepadirectdebit?
+        transaction_type.upcase == "C008"
       end
 
       def success?

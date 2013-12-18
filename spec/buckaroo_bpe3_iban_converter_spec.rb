@@ -57,7 +57,7 @@ describe "Buckaroo IBAN Converter implementation for ActiveMerchant" do
     it "should return IBAN + BIC for old account number via the Buckaroo API" do
 
       http_mock = mock(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
+      http_mock.should_receive(:read_timeout=).once.with(4)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
       
@@ -83,7 +83,7 @@ describe "Buckaroo IBAN Converter implementation for ActiveMerchant" do
     it "should return NO IBAN + BIC for old account number via the Buckaroo API if not valid" do
 
       http_mock = mock(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
+      http_mock.should_receive(:read_timeout=).once.with(4)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
       
@@ -105,6 +105,36 @@ describe "Buckaroo IBAN Converter implementation for ActiveMerchant" do
       
       @response.post_params.should_not == nil
     end
+  end
+
+  context "bic_for_iban" do
+
+    before :each do
+      @secretkey  = "secretkey"
+      @websitekey = "websitekey"
+      @gateway    = ActiveMerchant::Billing::BuckarooBPE3IbanConverterGateway.new(:secretkey => @secretkey, :websitekey => @websitekey)
+
+      @countryisocode = "NL"
+    end
+
+    it "should return the BIC for ABNA bank account" do
+      @accountnumber  = "NL00ABNA0000000000"
+      bic = @gateway.bic_for_iban({ accountnumber: @accountnumber, countryisocode: @countryisocode })
+      bic.should == "ABNANL2A"
+    end
+
+    it "should return the BIC for INGB bank account" do
+      @accountnumber  = "NL00INGB0000000000"
+      bic = @gateway.bic_for_iban({ accountnumber: @accountnumber, countryisocode: @countryisocode })
+      bic.should == "INGBNL2A"
+    end
+
+    it "should return the BIC for RABO bank account" do
+      @accountnumber  = "NL00RABO0000000000"
+      bic = @gateway.bic_for_iban({ accountnumber: @accountnumber, countryisocode: @countryisocode })
+      bic.should == "RABONL2U"
+    end
 
   end
+
 end

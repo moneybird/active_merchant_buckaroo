@@ -75,6 +75,7 @@ module ActiveMerchant
 
         post_params = {
           brq_accountnumber: accountnumber,
+          brq_channel: "CALLCENTER",
           brq_countryisocode: countryisocode,
           brq_websitekey: @options[:websitekey]
         }

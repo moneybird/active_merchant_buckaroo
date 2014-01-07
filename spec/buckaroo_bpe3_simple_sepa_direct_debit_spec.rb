@@ -129,6 +129,7 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
 
       @response.post_params.should_not be_nil
       @response.post_params[:brq_amount].should == @amount
+      @response.post_params[:brq_channel].should == "CALLCENTER"
       @response.post_params[:brq_description].should == @description
       @response.post_params[:brq_invoicenumber].should == @invoicenumber
       @response.post_params[:brq_payment_method].should == "simplesepadirectdebit"

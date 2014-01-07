@@ -40,6 +40,7 @@ module ActiveMerchant
 
         post_params = {
           brq_amount: money,
+          brq_channel: "CALLCENTER",
           brq_culture: options[:culture] ? options[:culture] : "EN",
           brq_currency: options[:currency] ? options[:currency] : "EUR",
           brq_description: options[:description],

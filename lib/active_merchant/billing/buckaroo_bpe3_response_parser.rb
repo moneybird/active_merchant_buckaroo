@@ -138,8 +138,10 @@ module ActiveMerchant #:nodoc:
 
       def reversal?
         # Only for BuckarooBPE3Push, not for BuckarooBPE3Response
-        # C562 is for directdebit and C501 for simplesepadirectdebit
-        ["C501", "C562"].include?(transaction_type.upcase)
+        # C501 for simplesepadirectdebit storno
+        # C502 for simplesepadirectdebit reject
+        # C562 is for directdebit
+        ["C501", "C502", "C562"].include?(transaction_type.upcase)
       end
 
       def signature_valid?

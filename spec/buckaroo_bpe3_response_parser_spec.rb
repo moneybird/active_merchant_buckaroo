@@ -50,104 +50,146 @@ describe "Buckaroo Response And Push Parser" do
       response_parser.test?.should == true
     end
 
+    context "brq_transaction_method" do
 
-    it "should parse a push correctly - brq_transaction_method - 1 - transfer" do
-      params = { "brq_transaction_type" => "C001" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.creditcard?.should == false
-      response_parser.directdebit?.should == false
-      response_parser.directdebitrecurring?.should == false
-      response_parser.reversal?.should == false
-      response_parser.transfer?.should == true
+      it "should parse a push correctly - brq_transaction_method - transfer" do
+        params = { "brq_transaction_type" => "C001" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == false
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == false
+        response_parser.reversal?.should == false
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == true
+      end
+
+      it "should parse a push correctly - brq_transaction_method - directdebit" do
+        params = { "brq_transaction_type" => "C002" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == false
+        response_parser.directdebit?.should == true
+        response_parser.directdebitrecurring?.should == false
+        response_parser.reversal?.should == false
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == false
+      end
+
+      it "should parse a push correctly - brq_transaction_method - directdebitrecurring" do
+        params = { "brq_transaction_type" => "C003" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == false
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == true
+        response_parser.reversal?.should == false
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == false
+      end
+
+      it "should parse a push correctly - brq_transaction_method - simplesepadirectdebit" do
+        params = { "brq_transaction_type" => "C008" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == false
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == false
+        response_parser.reversal?.should == false
+        response_parser.simplesepadirectdebit?.should == true
+        response_parser.transfer?.should == false
+      end
+
+      it "should parse a push correctly - brq_transaction_method - debit reversal" do
+        params = { "brq_transaction_type" => "C562" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == false
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == false
+        response_parser.reversal?.should == true
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == false
+      end
+
+      it "should parse a push correctly - brq_transaction_method - SEPA reversal" do
+        params = { "brq_transaction_type" => "C501" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == false
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == false
+        response_parser.reversal?.should == true
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == false
+      end
+
+      it "should parse a push correctly - brq_transaction_method - SEPA reversal" do
+        params = { "brq_transaction_type" => "C502" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == false
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == false
+        response_parser.reversal?.should == true
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == false
+      end
+
+      it "should parse a push correctly - brq_transaction_method - mastercard" do
+        params = { "brq_transaction_type" => "V043" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == true
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == false
+        response_parser.mastercard?.should == true
+        response_parser.reversal?.should == false
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == false
+        response_parser.visa?.should == false
+      end
+
+      it "should parse a push correctly - brq_transaction_method - visa" do
+        params = { "brq_transaction_type" => "V044" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.creditcard?.should == true
+        response_parser.directdebit?.should == false
+        response_parser.directdebitrecurring?.should == false
+        response_parser.mastercard?.should == false
+        response_parser.reversal?.should == false
+        response_parser.simplesepadirectdebit?.should == false
+        response_parser.transfer?.should == false
+        response_parser.visa?.should == true
+      end
     end
 
-    it "should parse a push correctly - brq_transaction_method - 1 - directdebit" do
-      params = { "brq_transaction_type" => "C002" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.creditcard?.should == false
-      response_parser.directdebit?.should == true
-      response_parser.directdebitrecurring?.should == false
-      response_parser.reversal?.should == false
-      response_parser.transfer?.should == false
+    context "brq_statuscode" do
+
+      it "should parse a push correctly - brq_statuscode - 1" do
+        params = { "brq_statuscode" => "791" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.failure?.should == false
+        response_parser.pending?.should == true
+        response_parser.success?.should == false
+      end
+
+      it "should parse a push correctly - brq_statuscode - 2" do
+        params = { "brq_statuscode" => "190" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.failure?.should == false
+        response_parser.pending?.should == false
+        response_parser.success?.should == true
+      end
+
+      it "should parse a push correctly - brq_statuscode - 3" do
+        params = { "brq_statuscode" => "490" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.failure?.should == true
+        response_parser.pending?.should == false
+        response_parser.success?.should == false
+      end
+
+      it "should parse a push correctly - brq_statuscode - 4" do
+        params = { "brq_statuscode" => "999" }
+        response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
+        response_parser.failure?.should == false
+        response_parser.pending?.should == false
+        response_parser.success?.should == false
+      end
+
     end
-
-    it "should parse a push correctly - brq_transaction_method - 2 - directdebitrecurring" do
-      params = { "brq_transaction_type" => "C003" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.creditcard?.should == false
-      response_parser.directdebit?.should == false
-      response_parser.directdebitrecurring?.should == true
-      response_parser.reversal?.should == false
-      response_parser.transfer?.should == false
-    end
-
-    it "should parse a push correctly - brq_transaction_method - 3 - reversal" do
-      params = { "brq_transaction_type" => "C562" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.creditcard?.should == false
-      response_parser.directdebit?.should == false
-      response_parser.directdebitrecurring?.should == false
-      response_parser.reversal?.should == true
-      response_parser.transfer?.should == false
-    end
-
-    it "should parse a push correctly - brq_transaction_method - 4 - mastercard" do
-      params = { "brq_transaction_type" => "V043" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.creditcard?.should == true
-      response_parser.directdebit?.should == false
-      response_parser.directdebitrecurring?.should == false
-      response_parser.mastercard?.should == true
-      response_parser.reversal?.should == false
-      response_parser.transfer?.should == false
-      response_parser.visa?.should == false
-    end
-
-    it "should parse a push correctly - brq_transaction_method - 5 - visa" do
-      params = { "brq_transaction_type" => "V044" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.creditcard?.should == true
-      response_parser.directdebit?.should == false
-      response_parser.directdebitrecurring?.should == false
-      response_parser.mastercard?.should == false
-      response_parser.reversal?.should == false
-      response_parser.transfer?.should == false
-      response_parser.visa?.should == true
-    end
-
-
-    it "should parse a push correctly - brq_statuscode - 1" do
-      params = { "brq_statuscode" => "791" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.failure?.should == false
-      response_parser.pending?.should == true
-      response_parser.success?.should == false
-    end
-
-    it "should parse a push correctly - brq_statuscode - 2" do
-      params = { "brq_statuscode" => "190" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.failure?.should == false
-      response_parser.pending?.should == false
-      response_parser.success?.should == true
-    end
-
-    it "should parse a push correctly - brq_statuscode - 3" do
-      params = { "brq_statuscode" => "490" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.failure?.should == true
-      response_parser.pending?.should == false
-      response_parser.success?.should == false
-    end
-
-    it "should parse a push correctly - brq_statuscode - 4" do
-      params = { "brq_statuscode" => "999" }
-      response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(params, @secretkey)
-      response_parser.failure?.should == false
-      response_parser.pending?.should == false
-      response_parser.success?.should == false
-    end
-
   end
-
 end

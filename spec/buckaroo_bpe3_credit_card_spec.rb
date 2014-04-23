@@ -1,7 +1,7 @@
 require "spec_helper.rb"
 
 describe "Buckaroo Credird Card implementation for ActiveMerchant" do
-  
+
   it "should create a new billing gateway with a required merchantid and secretkey" do
     ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( { secretkey: "1234", websitekey: "1234" } ).should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway)
   end
@@ -9,9 +9,9 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
   it "should throw an error if a gateway is created without merchantid or secretkey" do
     lambda {
       ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( { secretkey: "1234" } )
-    }.should raise_error(ArgumentError) 
+    }.should raise_error(ArgumentError)
   end
-  
+
   it "should throw an error if a gateway is created without merchantid or secretkey" do
     lambda {
       ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( { websitekey: "1234" } )
@@ -19,15 +19,15 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
   end
 
   context "setup purchase" do
-    
+
     before do
       @secretkey  = "secretkey"
       @websitekey = "websitekey"
       @gateway    = ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( {
-        secretkey:  @secretkey, 
+        secretkey:  @secretkey,
         websitekey: @websitekey
       } )
-      
+
       @amount         = 1.23
       @culture        = "EN"
       @currency       = "EUR"
@@ -36,7 +36,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
       @payment_method = "mastercard"
       @return         = "http://localhost/returnurl"
     end
-    
+
     context "ArgumentErrors" do
 
       it "should raise an ArumentError when culture is not DE, EN or NL" do
@@ -94,7 +94,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
             return:         @return
           }) }.should raise_error(ArgumentError)
       end
-    
+
       it "should raise an ArumentError when string payment_method is not equal to mastercard or visa" do
         @payment_method = "myowncreditcard"
 
@@ -108,7 +108,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
             return:         @return
           }) }.should raise_error(ArgumentError)
       end
-    
+
     end
 
     it "should also work with visa cards" do
@@ -125,18 +125,18 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
       })
       @response.post_params[:brq_payment_method].should == "visa"
     end
-    
+
     it "should create a new purchase via the Buckaroo API" do
 
-      http_mock = mock(Net::HTTP)
+      http_mock = double(Net::HTTP)
       http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-      
-      response_mock = mock(Net::HTTPResponse)
+
+      response_mock = double(Net::HTTPResponse)
       response_mock.should_receive(:body).and_return('BRQ_ACTIONREQUIRED=redirect&BRQ_AMOUNT=1.23&BRQ_APIRESULT=ActionRequired&BRQ_CURRENCY=EUR&BRQ_INVOICENUMBER=2013-0001&BRQ_MUTATIONTYPE=NotSet&BRQ_REDIRECTURL=https%3a%2f%2fcheckout.buckaroo.nl%2fhtml%2fredirect.ashx%3fr%3d44444BB28423418F555EDD866F59C880&BRQ_STATUSCODE=790&BRQ_STATUSMESSAGE=Pending+input&BRQ_TEST=false&BRQ_TIMESTAMP=2013-06-14+11%3a02%3a21&BRQ_TRANSACTIONS=7A6C58B91KJH4E66B53A91928NNN4D7F&BRQ_SIGNATURE=a1875c8ecd209b0173692ca83d002c4ed02785c2')
       http_mock.should_receive(:post).and_return(response_mock)
-      
+
       @response = @gateway.purchase(@amount, nil, {
         culture:        @culture,
         currency:       @currency,
@@ -145,7 +145,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
         payment_method: @payment_method,
         return:         @return
       })
-      
+
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.invoicenumber.should == @invoicenumber
       @response.redirecturl.should == "https://checkout.buckaroo.nl/html/redirect.ashx?r=44444BB28423418F555EDD866F59C880"
@@ -168,15 +168,15 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
 
     it "should still work with empty response" do
 
-      http_mock = mock(Net::HTTP)      
+      http_mock = double(Net::HTTP)
       http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-      
-      response_mock = mock(Net::HTTPResponse)
+
+      response_mock = double(Net::HTTPResponse)
       response_mock.should_receive(:body).and_return("")
       http_mock.should_receive(:post).and_return(response_mock)
-      
+
       @response = @gateway.purchase(@amount, nil, {
         culture:        @culture,
         currency:       @currency,
@@ -185,7 +185,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
         payment_method: @payment_method,
         return:         @return
       })
-      
+
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.response_data.should == ""
       @response.success?.should == false
@@ -194,15 +194,15 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
 
     it "should still work with crappy response" do
 
-      http_mock = mock(Net::HTTP)      
+      http_mock = double(Net::HTTP)
       http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-      
-      response_mock = mock(Net::HTTPResponse)
+
+      response_mock = double(Net::HTTPResponse)
       response_mock.should_receive(:body).and_return("this is a very nasty response")
       http_mock.should_receive(:post).and_return(response_mock)
-      
+
       @response = @gateway.purchase(@amount, nil, {
         culture:        @culture,
         currency:       @currency,
@@ -211,7 +211,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
         payment_method: @payment_method,
         return:         @return
       })
-      
+
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.response_data.should == "this is a very nasty response"
       @response.success?.should == false
@@ -220,15 +220,15 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
   end
 
   context "setup recurring" do
-    
+
     before do
       @secretkey  = "secretkey"
       @websitekey = "websitekey"
       @gateway    = ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( {
-        secretkey:  @secretkey, 
+        secretkey:  @secretkey,
         websitekey: @websitekey
       } )
-      
+
       @amount               = 1.23
       @currency             = "EUR"
       @description          = "Description"
@@ -236,7 +236,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
       @originaltransaction  = "AAAABBBB"
       @payment_method       = "mastercard"
     end
-    
+
     context "ArgumentErrors" do
 
       it "should raise an ArumentError when currency is not EUR, GBP or USD" do
@@ -277,7 +277,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
             payment_method:       @payment_method,
           }) }.should raise_error(ArgumentError)
       end
-    
+
       it "should raise an ArumentError when string originaltransaction is not present" do
         lambda {
           @gateway.recurring(@amount, nil, {
@@ -287,7 +287,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
             payment_method:       @payment_method,
           }) }.should raise_error(ArgumentError)
       end
-    
+
       it "should raise an ArumentError when string payment_method is not equal to mastercard or visa" do
         @payment_method = "myowncreditcard"
 
@@ -300,9 +300,9 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
             payment_method:       @payment_method,
           }) }.should raise_error(ArgumentError)
       end
-    
+
     end
-    
+
     it "should also work with visa cards" do
 
       @payment_method = "visa"
@@ -319,15 +319,15 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
 
     it "should create a new recurring via the Buckaroo API" do
 
-      http_mock = mock(Net::HTTP)
+      http_mock = double(Net::HTTP)
       http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-      
-      response_mock = mock(Net::HTTPResponse)
+
+      response_mock = double(Net::HTTPResponse)
       response_mock.should_receive(:body).and_return('BRQ_AMOUNT=1.23&BRQ_APIRESULT=Success&BRQ_CURRENCY=EUR&BRQ_INVOICENUMBER=2013-0001&BRQ_PAYMENT=89E1B0F2793C22C0B62EE0F8E971AD21&BRQ_PAYMENT_METHOD=mastercard&BRQ_SERVICE_MASTERCARD_CARDNUMBERENDING=1111&BRQ_STATUSCODE=190&BRQ_STATUSCODE_DETAIL=S001&BRQ_STATUSMESSAGE=Payment+successfully+processed&BRQ_TEST=false&BRQ_TIMESTAMP=2013-06-14+14%3a59%3a36&BRQ_TRANSACTIONS=AABKKKE5810949444B92F51A4CAH8HDD&BRQ_SIGNATURE=b5956d4a3304218437cd15c85b539fa37420c56a')
       http_mock.should_receive(:post).and_return(response_mock)
-      
+
       @response = @gateway.recurring(@amount, nil, {
         currency:             @currency,
         description:          @description,
@@ -335,7 +335,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
         originaltransaction:  @originaltransaction,
         payment_method:       @payment_method,
       })
-      
+
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.invoicenumber.should == @invoicenumber
       @response.success?.should == true
@@ -356,15 +356,15 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
 
     it "should still work with empty response" do
 
-      http_mock = mock(Net::HTTP)      
+      http_mock = double(Net::HTTP)
       http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-      
-      response_mock = mock(Net::HTTPResponse)
+
+      response_mock = double(Net::HTTPResponse)
       response_mock.should_receive(:body).and_return("")
       http_mock.should_receive(:post).and_return(response_mock)
-      
+
       @response = @gateway.recurring(@amount, nil, {
         currency:             @currency,
         description:          @description,
@@ -372,7 +372,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
         originaltransaction:  @originaltransaction,
         payment_method:       @payment_method,
       })
-      
+
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.response_data.should == ""
       @response.success?.should == false
@@ -381,15 +381,15 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
 
     it "should still work with crappy response" do
 
-      http_mock = mock(Net::HTTP)      
+      http_mock = double(Net::HTTP)
       http_mock.should_receive(:read_timeout=).once.with(300)
       http_mock.should_receive(:use_ssl=).once.with(true)
       Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-      
-      response_mock = mock(Net::HTTPResponse)
+
+      response_mock = double(Net::HTTPResponse)
       response_mock.should_receive(:body).and_return("this is a very nasty response")
       http_mock.should_receive(:post).and_return(response_mock)
-      
+
       @response = @gateway.recurring(@amount, nil, {
         currency:             @currency,
         description:          @description,
@@ -397,7 +397,7 @@ describe "Buckaroo Credird Card implementation for ActiveMerchant" do
         originaltransaction:  @originaltransaction,
         payment_method:       @payment_method,
       })
-      
+
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.response_data.should == "this is a very nasty response"
       @response.success?.should == false

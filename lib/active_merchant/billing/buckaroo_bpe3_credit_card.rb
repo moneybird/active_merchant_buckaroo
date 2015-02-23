@@ -21,10 +21,10 @@ module ActiveMerchant
       # * <tt>:description</tt>     -- The description for the transaction (REQUIRED)
       # * <tt>:invoicenumber</tt>   -- The invoicenumber for the transaction (REQUIRED)
       # * <tt>:payment_method</tt>  -- The payment method for the transaction, choices: mastercard or visa (REQUIRED)
-      # * <tt>:return</tt>          -- The return url for customer who paid or cancelled transaction (REQUIRED)
+      # * <tt>:return</tt>          -- The return url for customer who paid or cancelled transaction (OPTIONAL)
       # * <tt>:startrecurring</tt>  -- Should Buckaroo store the credit card information for future use? Default: false (OPTIONAL)
       def purchase(money, creditcard, options = {})
-        requires!(options, :description, :invoicenumber, :payment_method, :return)
+        requires!(options, :description, :invoicenumber, :payment_method)
 
         raise ArgumentError.new("money should be more than 0") if money <= 0
         
@@ -60,7 +60,6 @@ module ActiveMerchant
         }
 
         if response_parser.valid?
-          # success = response_parser.statuscode == "790"
           success = response_parser.pending?
           return ActiveMerchant::Billing::BuckarooBPE3Response.new(success, response_parser.statusmessage, return_params)
         else
@@ -69,6 +68,8 @@ module ActiveMerchant
 
       end
 
+      # ==== Options same as purchase method above plus the following
+      # * <tt>:originaltransaction</tt> -- The unique key of the original transaction (REQUIRED)
       def recurring(money, creditcard, options = {})
         requires!(options, :description, :invoicenumber, :originaltransaction, :payment_method)
 
@@ -88,6 +89,7 @@ module ActiveMerchant
           brq_payment_method: options[:payment_method],
           brq_websitekey: @options[:websitekey]
         }
+        post_params[:brq_return] = options[:return] if options[:return]
         post_params[:brq_service_mastercard_action] = "PayRecurrent" if options[:payment_method] == "mastercard"
         post_params[:brq_service_visa_action]       = "PayRecurrent" if options[:payment_method] == "visa"
 
@@ -103,7 +105,6 @@ module ActiveMerchant
         }
 
         if response_parser.valid?
-          # success = response_parser.statuscode == "190"
           success = response_parser.success?
           return ActiveMerchant::Billing::BuckarooBPE3Response.new(success, response_parser.statusmessage, return_params)
         else

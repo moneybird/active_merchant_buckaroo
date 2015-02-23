@@ -69,7 +69,6 @@ module ActiveMerchant
         }
 
         if response_parser.valid?
-          # success = response_parser.statuscode == "791"
           success = response_parser.pending?
           return ActiveMerchant::Billing::BuckarooBPE3Response.new(success, response_parser.statusmessage, return_params)
         else

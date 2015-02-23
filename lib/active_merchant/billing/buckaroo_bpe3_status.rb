@@ -5,7 +5,7 @@ module ActiveMerchant
     class BuckarooBPE3StatusGateway < Gateway
 
       # ==== Options
-      # * <tt>:secretkey</tt> -- The Buckaroo Secret Key (REQUIRED)
+      # * <tt>:secretkey</tt>  -- The Buckaroo Secret Key (REQUIRED)
       # * <tt>:websitekey</tt> -- The Buckaroo Websitekey (REQUIRED)
       def initialize(options = {})
         requires!(options, :secretkey, :websitekey)
@@ -15,6 +15,9 @@ module ActiveMerchant
         super
       end
 
+      # ==== Options
+      # * <tt>:amount_invoice</tt> -- Needed to check whether invoice is paid or not (REQUIRED)
+      # * <tt>:invoicenumber</tt>  -- The invoice number (REQUIRED)
       def status_for_invoicenumber(options = {})
         requires!(options, :amount_invoice)
         requires!(options, :invoicenumber)

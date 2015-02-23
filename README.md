@@ -107,4 +107,4 @@ is_paid is a boolean to check whether the invoice is paid or not. This is based 
 
 ## What if it doesn't work?
 
-More information can be found in the source, for example the BuckarooBPE3Response and BuckarooBPE3ResponseParser class provide a lot of convenience functions. BuckarooBPE3Response is the object returned to you when initiating a call, BuckarooBPE3ResponseParser will be used to parse the returned code from Buckaroo (response to call or push data).
+More information can be found in the source, for example the BuckarooBPE3Response and BuckarooBPE3ResponseParser class provide a lot of convenience functions. BuckarooBPE3Response is the object returned to you when initiating a call, BuckarooBPE3ResponseParser will be used to parse the returned data from Buckaroo (response to call or push data).

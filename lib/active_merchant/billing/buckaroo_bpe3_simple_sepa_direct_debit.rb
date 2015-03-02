@@ -5,9 +5,9 @@ module ActiveMerchant
       # ==== Options
       # * <tt>:secretkey</tt> -- The Buckaroo Secret Key (REQUIRED)
       # * <tt>:websitekey</tt> -- The Buckaroo Websitekey (REQUIRED)
-      # * <tt>:sepa_mandate_prefix</tt> -- The Buckaroo Prefix for SEPA transactions (ie: "12F") (REQUIRED)
+      # * <tt>:sepa_mandate_prefix</tt> -- The Buckaroo Prefix for SEPA transactions (ie: "12F") (OPTIONAL)
       def initialize(options = {})
-        requires!(options, :secretkey, :websitekey, :sepa_mandate_prefix)
+        requires!(options, :secretkey, :websitekey)
         @options = options
         @options[:url] = ActiveMerchant::Billing::Base.test? ? "https://testcheckout.buckaroo.nl/nvp/" : "https://checkout.buckaroo.nl/nvp/"
         @options[:url] += "?op=TransactionRequest"
@@ -39,6 +39,9 @@ module ActiveMerchant
         raise ArgumentError.new("description should be max 40 chars long") if options[:description].size > 40
         raise ArgumentError.new("invoicenumber should be max 40 chars long") if options[:invoicenumber].size > 40
 
+        mandatereference = options[:mandatereference]
+        mandatereference = "#{@options[:sepa_mandate_prefix]}-#{mandatereference}"  if @options[:sepa_mandate_prefix]
+
         post_params = {
           brq_amount: money,
           brq_channel: "CALLCENTER",
@@ -53,7 +56,7 @@ module ActiveMerchant
           brq_service_simplesepadirectdebit_customerbic: options[:customerbic],
           brq_service_simplesepadirectdebit_customeriban: options[:customeriban],
           brq_service_simplesepadirectdebit_mandatedate: options[:mandatedate].strftime("%Y-%m-%d"),
-          brq_service_simplesepadirectdebit_mandatereference: "#{@options[:sepa_mandate_prefix]}-#{options[:mandatereference]}",
+          brq_service_simplesepadirectdebit_mandatereference: mandatereference,
           brq_startrecurrent: true,
           brq_websitekey: @options[:websitekey]
         }

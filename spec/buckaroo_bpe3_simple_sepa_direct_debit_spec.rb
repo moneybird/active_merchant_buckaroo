@@ -35,7 +35,7 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
       @description          = "Description"
       @invoicenumber        = "2013-0001"
       @mandatedate          = Date.today
-      @mandatereference     = "000-TEST-000001"
+      @mandatereference     = "TEST-000001"
 
       @params = {
         collectdate: @collectdate,
@@ -107,6 +107,44 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
 
     end
 
+    context "sepa mandate prefix" do
+      it "should be compatible with old situation - buckaroo sepa prefix in mandatereference" do
+        http_mock = double(Net::HTTP)
+        http_mock.should_receive(:read_timeout=).once.with(300)
+        http_mock.should_receive(:use_ssl=).once.with(true)
+        Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
+
+        response_mock = double(Net::HTTPResponse)
+        response_mock.should_receive(:body).and_return('')
+        http_mock.should_receive(:post).and_return(response_mock)
+
+        @gateway = ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: @secretkey, websitekey: @websitekey })
+        @params[:mandatereference] = "000-TEST-000003"
+        @response = @gateway.purchase(@amount, nil, @params)
+
+        @response.post_params.should_not be_nil
+        @response.post_params[:brq_service_simplesepadirectdebit_mandatereference].should == "000-TEST-000003"
+      end
+
+      it "should be compatible with new situation - buckaroo sepa prefix as gateway argument" do
+        http_mock = double(Net::HTTP)
+        http_mock.should_receive(:read_timeout=).once.with(300)
+        http_mock.should_receive(:use_ssl=).once.with(true)
+        Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
+
+        response_mock = double(Net::HTTPResponse)
+        response_mock.should_receive(:body).and_return('')
+        http_mock.should_receive(:post).and_return(response_mock)
+
+        @gateway = ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: @secretkey, websitekey: @websitekey, sepa_mandate_prefix: "000" })
+        @params[:mandatereference] = "TEST-000004"
+        @response = @gateway.purchase(@amount, nil, @params)
+
+        @response.post_params.should_not be_nil
+        @response.post_params[:brq_service_simplesepadirectdebit_mandatereference].should == "000-TEST-000004"
+      end
+    end
+
     it "should create a new purchase via the Buckaroo API" do
 
       http_mock = double(Net::HTTP)
@@ -128,6 +166,7 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
       @response.amount.should == @amount.to_s
       @response.invoicenumber.should == @invoicenumber
       @response.simplesepadirectdebit_collectdate.should == "2013-12-23"
+      @response.simplesepadirectdebit_mandatereference.should == "000-TEST-000001"
 
       @response.post_params.should_not be_nil
       @response.post_params[:brq_amount].should == @amount

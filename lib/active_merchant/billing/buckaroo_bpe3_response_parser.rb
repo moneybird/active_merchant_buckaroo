@@ -77,6 +77,10 @@ module ActiveMerchant #:nodoc:
         response_params["brq_service_simplesepadirectdebit_collectdate"]
       end
 
+      def simplesepadirectdebit_mandatereference
+        response_params["brq_service_simplesepadirectdebit_mandatereference"]
+      end
+
       def statuscode
         response_params["brq_statuscode"]
       end

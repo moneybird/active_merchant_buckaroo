@@ -26,6 +26,10 @@ module ActiveMerchant #:nodoc:
         response_parser.simplesepadirectdebit_collectdate
       end
 
+      def simplesepadirectdebit_mandatereference
+        response_parser.simplesepadirectdebit_mandatereference
+      end
+
       def transactions
         response_parser.transactions
       end

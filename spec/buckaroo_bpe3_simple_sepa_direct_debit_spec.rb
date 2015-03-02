@@ -4,18 +4,18 @@ require "spec_helper.rb"
 describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" do
 
   it "should create a new billing gateway with a required merchantid and secretkey" do
-    ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new(:secretkey => "1234", :websitekey => "1234").should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway)
+    ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: "1234", websitekey: "1234", sepa_mandate_prefix: "000" }).should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway)
   end
 
   it "should throw an error if a gateway is created without merchantid or secretkey" do
     lambda {
-      ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new(:secretkey => "1234")
+      ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: "1234" })
     }.should raise_error(ArgumentError)
   end
 
   it "should throw an error if a gateway is created without merchantid or secretkey" do
     lambda {
-      ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new(:websitekey => "1234")
+      ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ websitekey: "1234" })
     }.should raise_error(ArgumentError)
   end
 
@@ -24,7 +24,8 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
     before do
       @secretkey  = "secretkey"
       @websitekey = "websitekey"
-      @gateway    = ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new(:secretkey => @secretkey, :websitekey => @websitekey)
+      @sepa_mandate_prefix = "000"
+      @gateway    = ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: @secretkey, websitekey: @websitekey, sepa_mandate_prefix: @sepa_mandate_prefix })
 
       @amount               = 1.23
       @collectdate          = Date.today
@@ -126,6 +127,7 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
       @response.statuscode.should == "791"
       @response.amount.should == @amount.to_s
       @response.invoicenumber.should == @invoicenumber
+      @response.simplesepadirectdebit_collectdate.should == "2013-12-23"
 
       @response.post_params.should_not be_nil
       @response.post_params[:brq_amount].should == @amount

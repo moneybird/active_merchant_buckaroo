@@ -5,8 +5,9 @@ module ActiveMerchant
       # ==== Options
       # * <tt>:secretkey</tt> -- The Buckaroo Secret Key (REQUIRED)
       # * <tt>:websitekey</tt> -- The Buckaroo Websitekey (REQUIRED)
+      # * <tt>:sepa_mandate_prefix</tt> -- The Buckaroo Prefix for SEPA transactions (ie: "12F") (REQUIRED)
       def initialize(options = {})
-        requires!(options, :secretkey, :websitekey)
+        requires!(options, :secretkey, :websitekey, :sepa_mandate_prefix)
         @options = options
         @options[:url] = ActiveMerchant::Billing::Base.test? ? "https://testcheckout.buckaroo.nl/nvp/" : "https://checkout.buckaroo.nl/nvp/"
         @options[:url] += "?op=TransactionRequest"
@@ -32,7 +33,7 @@ module ActiveMerchant
         raise ArgumentError.new("collectdate should be Date object") if options[:collectdate].class != Date
         raise ArgumentError.new("customeraccountname should be max 40 chars long") if options[:customeraccountname].size > 40
         raise ArgumentError.new("mandatedate should be Date object") if options[:mandatedate].class != Date
-        
+
         raise ArgumentError.new("culture should be DE, EN or NL") if options[:culture] and ![ "DE", "EN", "NL" ].include?(options[:culture])
         raise ArgumentError.new("currency should be EUR") if options[:currency] and options[:currency] != "EUR"
         raise ArgumentError.new("description should be max 40 chars long") if options[:description].size > 40
@@ -52,7 +53,7 @@ module ActiveMerchant
           brq_service_simplesepadirectdebit_customerbic: options[:customerbic],
           brq_service_simplesepadirectdebit_customeriban: options[:customeriban],
           brq_service_simplesepadirectdebit_mandatedate: options[:mandatedate].strftime("%Y-%m-%d"),
-          brq_service_simplesepadirectdebit_mandatereference: options[:mandatereference],
+          brq_service_simplesepadirectdebit_mandatereference: "#{@options[:sepa_mandate_prefix]}-#{options[:mandatereference]}",
           brq_startrecurrent: true,
           brq_websitekey: @options[:websitekey]
         }
@@ -62,7 +63,7 @@ module ActiveMerchant
 
         response_data = ActiveMerchant::Billing::BuckarooBPE3Toolbox.commit(@options[:url], post_data)
         response_parser = ActiveMerchant::Billing::BuckarooBPE3ResponseParser.new(response_data, @options[:secretkey])
-        return_params = { 
+        return_params = {
           post_data: post_data,
           post_params: post_params,
           response_parser: response_parser

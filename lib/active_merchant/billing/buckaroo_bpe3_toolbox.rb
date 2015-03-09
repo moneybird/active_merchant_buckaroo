@@ -23,7 +23,7 @@ module ActiveMerchant
         # puts sig
         sig
       end
-      
+
       def self.commit(url, post_data, read_timeout = 300)
         uri = URI.parse(url)
         http = Net::HTTP.new(uri.host, uri.port)

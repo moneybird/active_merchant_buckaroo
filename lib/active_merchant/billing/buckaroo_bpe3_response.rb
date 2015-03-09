@@ -30,6 +30,14 @@ module ActiveMerchant #:nodoc:
         response_parser.simplesepadirectdebit_mandatereference
       end
 
+      def simplesepadirectdebit_reasoncode
+        response_parser.simplesepadirectdebit_reasoncode
+      end
+
+      def simplesepadirectdebit_reasontext
+        response_parser.simplesepadirectdebit_reasontext
+      end
+
       def transactions
         response_parser.transactions
       end
@@ -57,6 +65,10 @@ module ActiveMerchant #:nodoc:
 
       def redirecturl
         response_parser.redirecturl
+      end
+
+      def relatedtransaction_reversal
+        response_parser.relatedtransaction_reversal
       end
 
       def statuscode

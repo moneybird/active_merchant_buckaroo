@@ -69,6 +69,10 @@ module ActiveMerchant #:nodoc:
         response_params["brq_redirecturl"]
       end
 
+      def relatedtransaction_reversal
+        response_params["brq_relatedtransaction_reversal"]
+      end
+
       def signature
         response_params["brq_signature"]
       end
@@ -79,6 +83,14 @@ module ActiveMerchant #:nodoc:
 
       def simplesepadirectdebit_mandatereference
         response_params["brq_service_simplesepadirectdebit_mandatereference"]
+      end
+
+      def simplesepadirectdebit_reasoncode
+        response_params["brq_service_simplesepadirectdebit_reasoncode"]
+      end
+
+      def simplesepadirectdebit_reasontext
+        response_params["brq_service_simplesepadirectdebit_reasonexplanation"]
       end
 
       def statuscode

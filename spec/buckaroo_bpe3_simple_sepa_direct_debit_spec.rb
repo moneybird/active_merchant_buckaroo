@@ -160,8 +160,8 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
 
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.response_data.should_not == ""
-      @response.success?.should be_true
-      @response.test?.should be_false
+      @response.success?.should be_truthy
+      @response.test?.should be_falsey
       @response.statuscode.should == "791"
       @response.amount.should == @amount.to_s
       @response.invoicenumber.should == @invoicenumber
@@ -194,8 +194,8 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
 
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
       @response.response_data.should_not == ""
-      @response.success?.should be_false
-      @response.test?.should be_false
+      @response.success?.should be_falsey
+      @response.test?.should be_falsey
       @response.statuscode.should == "491"
       @response.amount.should == @amount.to_s
       @response.invoicenumber.should == @invoicenumber
@@ -218,7 +218,7 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
       @response = @gateway.purchase(@amount, nil, @params)
 
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.success?.should be_false
+      @response.success?.should be_falsey
       @response.statuscode.should be_nil
       @response.response_data.should == ""
     end
@@ -237,7 +237,7 @@ describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" d
       @response = @gateway.purchase(@amount, nil, @params)
 
       @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.success?.should be_false
+      @response.success?.should be_falsey
       @response.statuscode.should be_nil
       @response.response_data.should == "this is a very nasty response"
     end

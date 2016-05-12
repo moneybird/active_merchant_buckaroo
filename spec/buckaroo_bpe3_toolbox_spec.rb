@@ -69,6 +69,15 @@ describe "Buckaroo BPE3 Toolbox" do
       result["brq_test"].should == "true"
     end
 
+    it "unescapes the string value when creating the signature" do
+      params_1 = { "brq_statusmessage"=>"Transaction+successfully+processed" }
+      params_2 = { "brq_statusmessage"=>"Transaction successfully processed" }
+
+      expect(ActiveMerchant::Billing::BuckarooBPE3Toolbox.create_signature(params_1, @secretkey)).to eq(
+        ActiveMerchant::Billing::BuckarooBPE3Toolbox.create_signature(params_2, @secretkey)
+      )
+    end
+
   end
 
 end

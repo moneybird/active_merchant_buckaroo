@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    active_merchant_buckaroo (0.3.0)
+    active_merchant_buckaroo (0.3.1)
       activemerchant
       nokogiri
 
@@ -13,7 +13,7 @@ GEM
       builder (>= 2.1.2, < 4.0.0)
       i18n (>= 0.6.9)
       nokogiri (~> 1.4)
-    activesupport (4.2.5.1)
+    activesupport (4.2.5.2)
       i18n (~> 0.7)
       json (~> 1.7, >= 1.7.7)
       minitest (~> 5.1)

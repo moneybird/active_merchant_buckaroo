@@ -25,7 +25,7 @@ module ActiveMerchant #:nodoc:
 
 
       def amount
-        response_params["brq_amount"]
+        response_params["brq_amount"] || (-1 * BigDecimal.new(response_params["brq_amount_credit"])).to_s
       end
 
       def apiresult
@@ -67,6 +67,10 @@ module ActiveMerchant #:nodoc:
 
       def redirecturl
         response_params["brq_redirecturl"]
+      end
+
+      def brq_relatedtransaction_refund
+        response_params["brq_relatedtransaction_refund"]
       end
 
       def relatedtransaction_reversal
@@ -181,7 +185,7 @@ module ActiveMerchant #:nodoc:
       end
 
       def transfer?
-        transaction_type.upcase == "C001"
+        transaction_type.upcase == "C001" || transaction_type.upcase == "C101"
       end
 
       def valid?

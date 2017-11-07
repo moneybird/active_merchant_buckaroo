@@ -17,7 +17,7 @@ module ActiveMerchant
 
       def self.create_signature(params, secretkey)
         sorted_params = ActiveMerchant::Billing::BuckarooBPE3Toolbox.sort_hash(params)
-        str_sig = sorted_params.map{|k,v| "#{k}=#{CGI.unescape(v.to_s)}"}.join
+        str_sig = sorted_params.map{|k,v| "#{k}=#{v}"}.join
         sig = Digest::SHA1.hexdigest(str_sig + secretkey)
         # TODO
         # puts sig

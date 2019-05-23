@@ -27,7 +27,8 @@ Gem::Specification.new do |s|
   s.add_dependency('nokogiri', '~> 1.4')
 
   s.add_development_dependency('rake')
-  s.add_development_dependency('test-unit', '~> 3')
   s.add_development_dependency('mocha', '~> 1')
   s.add_development_dependency('thor')
+  s.add_development_dependency('rack')
+  s.add_development_dependency('rspec')
 end

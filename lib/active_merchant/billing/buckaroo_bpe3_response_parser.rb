@@ -25,7 +25,7 @@ module ActiveMerchant #:nodoc:
 
 
       def amount
-        response_params["brq_amount"] || (-1 * BigDecimal.new(response_params["brq_amount_credit"])).to_s
+        response_params["brq_amount"] || (-1 * BigDecimal(response_params["brq_amount_credit"])).to_s
       end
 
       def apiresult

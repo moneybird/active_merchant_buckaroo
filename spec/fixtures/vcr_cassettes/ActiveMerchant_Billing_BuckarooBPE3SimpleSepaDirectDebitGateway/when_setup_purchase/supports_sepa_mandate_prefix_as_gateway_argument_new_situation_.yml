@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://checkout.buckaroo.nl/nvp/?op=TransactionRequest
+    body:
+      encoding: ASCII-8BIT
+      string: brq_amount=1.23&brq_channel=CALLCENTER&brq_culture=EN&brq_currency=EUR&brq_description=Description&brq_invoicenumber=2013-0001&brq_payment_method=simplesepadirectdebit&brq_service_simplesepadirectdebit_action=Pay&brq_service_simplesepadirectdebit_collectdate=2020-08-19&brq_service_simplesepadirectdebit_customeraccountname=Berend&brq_service_simplesepadirectdebit_customerbic=INGBNL2A&brq_service_simplesepadirectdebit_customeriban=NL20INGB0001234567&brq_service_simplesepadirectdebit_mandatedate=2020-08-19&brq_service_simplesepadirectdebit_mandatereference=000-TEST-000004&brq_startrecurrent=true&brq_websitekey=<WEBSITEKEY>&brq_signature=a53de189b176d836d4198edc96532543783c9ab2
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Aug 2020 11:21:58 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '214'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=d44d9f48eb6a3fa90396d8e80cad20ede1597836118; expires=Fri, 18-Sep-20
+        11:21:58 GMT; path=/; domain=.buckaroo.nl; HttpOnly; SameSite=Lax; Secure
+      Cache-Control:
+      - private
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Request-Id:
+      - 04a80d626b0000d8f59b93e200000001
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 5c537e7d79c6d8f5-AMS
+    body:
+      encoding: ASCII-8BIT
+      string: ""
+  recorded_at: Wed, 19 Aug 2020 11:21:58 GMT
+recorded_with: VCR 6.0.0

@@ -1,409 +1,205 @@
-require "spec_helper.rb"
+# frozen_string_literal: true
 
-describe "Buckaroo Credird Card implementation for ActiveMerchant" do
+require "spec_helper"
 
-  it "should create a new billing gateway with a required merchantid and secretkey" do
-    ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( { secretkey: "1234", websitekey: "1234" } ).should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway)
+describe ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway, :vcr do
+  let(:secretkey) { ENV['BUCKAROO_SECRET_KEY'] }
+  let(:websitekey) { ENV['BUCKAROO_WEBSITE_KEY'] }
+  let(:gateway) do
+    described_class.new(
+      secretkey: secretkey,
+      websitekey: websitekey
+    )
   end
 
-  it "should throw an error if a gateway is created without merchantid or secretkey" do
-    lambda {
-      ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( { secretkey: "1234" } )
-    }.should raise_error(ArgumentError)
+  it "creates a new billing gateway with a required websitekey and secretkey" do
+    expect(
+      described_class.new(secretkey: "1234", websitekey: "1234")
+    ).to be_kind_of(described_class)
   end
 
-  it "should throw an error if a gateway is created without merchantid or secretkey" do
-    lambda {
-      ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( { websitekey: "1234" } )
-    }.should raise_error(ArgumentError)
+  it "throws an error if a gateway is created without website key" do
+    expect { described_class.new(secretkey: "1234") }.to raise_error(ArgumentError)
   end
 
-  context "setup purchase" do
+  it "throws an error if a gateway is created without secret key" do
+    expect { described_class.new(websitekey: "1234") }.to raise_error(ArgumentError)
+  end
 
-    before do
-      @secretkey  = "secretkey"
-      @websitekey = "websitekey"
-      @gateway    = ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( {
-        secretkey:  @secretkey,
-        websitekey: @websitekey
-      } )
-
-      @amount         = 1.23
-      @culture        = "EN"
-      @currency       = "EUR"
-      @description    = "Description"
-      @invoicenumber  = "2013-0001"
-      @payment_method = "mastercard"
-      @return         = "http://localhost/returnurl"
+  context "when setup purchase" do
+    let(:amount) { 1.23 }
+    let(:options) do
+      {
+        culture: "EN",
+        currency: "EUR",
+        description: "Description",
+        invoicenumber: "2013-0001",
+        payment_method: "mastercard",
+        return: "http://localhost/returnurl"
+      }
     end
 
-    context "ArgumentErrors" do
+    it "raises an ArumentError when culture is not DE, EN or NL" do
+      options[:culture] = "FR"
 
-      it "should raise an ArumentError when culture is not DE, EN or NL" do
-        @culture = "FR"
-
-        lambda {
-          @gateway.purchase(@amount, nil, {
-            culture:        @culture,
-            currency:       @currency,
-            description:    @description,
-            invoicenumber:  @invoicenumber,
-            payment_method: @payment_method,
-            return:         @return
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when currency is not EUR, GBP or USD" do
-        @currency = "MYCURR"
-
-        lambda {
-          @gateway.purchase(@amount, nil, {
-            culture:        @culture,
-            currency:       @currency,
-            description:    @description,
-            invoicenumber:  @invoicenumber,
-            payment_method: @payment_method,
-            return:         @return
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string length of description is more than 40" do
-        @description = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
-
-        lambda {
-          @gateway.purchase(@amount, nil, {
-            culture:        @culture,
-            currency:       @currency,
-            description:    @description,
-            invoicenumber:  @invoicenumber,
-            payment_method: @payment_method,
-            return:         @return
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string length of invoicenumber is more than 40" do
-        @invoicenumber = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
-
-        lambda {
-          @gateway.purchase(@amount, nil, {
-            culture:        @culture,
-            currency:       @currency,
-            description:    @description,
-            invoicenumber:  @invoicenumber,
-            payment_method: @payment_method,
-            return:         @return
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string payment_method is not equal to mastercard or visa" do
-        @payment_method = "myowncreditcard"
-
-        lambda {
-          @gateway.purchase(@amount, nil, {
-            culture:        @culture,
-            currency:       @currency,
-            description:    @description,
-            invoicenumber:  @invoicenumber,
-            payment_method: @payment_method,
-            return:         @return
-          }) }.should raise_error(ArgumentError)
-      end
-
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should also work with visa cards" do
+    it "raises an ArumentError when currency is not EUR, GBP or USD" do
+      options[:currency] = "MYCURR"
 
-      @payment_method = "visa"
-
-      @response = @gateway.purchase(@amount, nil, {
-        culture:        @culture,
-        currency:       @currency,
-        description:    @description,
-        invoicenumber:  @invoicenumber,
-        payment_method: @payment_method,
-        return:         @return
-      })
-      @response.post_params[:brq_payment_method].should == "visa"
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should create a new purchase via the Buckaroo API" do
+    it "raises an ArumentError when string length of description is more than 40" do
+      options[:description] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return('BRQ_ACTIONREQUIRED=redirect&BRQ_AMOUNT=1.23&BRQ_APIRESULT=ActionRequired&BRQ_CURRENCY=EUR&BRQ_INVOICENUMBER=2013-0001&BRQ_MUTATIONTYPE=NotSet&BRQ_REDIRECTURL=https%3a%2f%2fcheckout.buckaroo.nl%2fhtml%2fredirect.ashx%3fr%3d44444BB28423418F555EDD866F59C880&BRQ_STATUSCODE=790&BRQ_STATUSMESSAGE=Pending+input&BRQ_TEST=false&BRQ_TIMESTAMP=2013-06-14+11%3a02%3a21&BRQ_TRANSACTIONS=7A6C58B91KJH4E66B53A91928NNN4D7F&BRQ_SIGNATURE=a1875c8ecd209b0173692ca83d002c4ed02785c2')
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.purchase(@amount, nil, {
-        culture:        @culture,
-        currency:       @currency,
-        description:    @description,
-        invoicenumber:  @invoicenumber,
-        payment_method: @payment_method,
-        return:         @return
-      })
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.invoicenumber.should == @invoicenumber
-      @response.redirecturl.should == "https://checkout.buckaroo.nl/html/redirect.ashx?r=44444BB28423418F555EDD866F59C880"
-      @response.success?.should == true
-      @response.statuscode.should == "790"
-      @response.test?.should == false
-
-      @response.response_data.should_not == ""
-      @response.amount.should == @amount.to_s
-
-      @response.post_params.should_not == nil
-      @response.post_params[:brq_amount].should == @amount
-      @response.post_params[:brq_culture].should == @culture
-      @response.post_params[:brq_currency].should == @currency
-      @response.post_params[:brq_description].should == @description
-      @response.post_params[:brq_invoicenumber].should == @invoicenumber
-      @response.post_params[:brq_payment_method].should == @payment_method
-      @response.post_params[:brq_return].should == @return
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should still work with empty response" do
+    it "raises an ArumentError when string length of invoicenumber is more than 40" do
+      options[:invoicenumber] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return("")
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.purchase(@amount, nil, {
-        culture:        @culture,
-        currency:       @currency,
-        description:    @description,
-        invoicenumber:  @invoicenumber,
-        payment_method: @payment_method,
-        return:         @return
-      })
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.response_data.should == ""
-      @response.success?.should == false
-      @response.statuscode.should == nil
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should still work with crappy response" do
+    it "raises an ArumentError when string payment_method is not equal to mastercard or visa" do
+      options[:payment_method] = "myowncreditcard"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
+    end
 
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return("this is a very nasty response")
-      http_mock.should_receive(:post).and_return(response_mock)
+    it "also works with visa cards" do
+      options[:payment_method] = "visa"
 
-      @response = @gateway.purchase(@amount, nil, {
-        culture:        @culture,
-        currency:       @currency,
-        description:    @description,
-        invoicenumber:  @invoicenumber,
-        payment_method: @payment_method,
-        return:         @return
-      })
+      response = gateway.purchase(amount, nil, options)
+      expect(response.post_params[:brq_payment_method]).to eq("visa")
+    end
 
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.response_data.should == "this is a very nasty response"
-      @response.success?.should == false
-      @response.statuscode.should == nil
+    it "creates a new purchase via the Buckaroo API" do
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response.invoicenumber).to eq(options[:invoicenumber])
+      expect(response.redirecturl).to eq("https://checkout.buckaroo.nl/html/redirect.ashx?r=21DF69234D3246209C80AD0E43075CDB")
+      expect(response).to be_success
+      expect(response.statuscode).to eq("790")
+      expect(response).not_to be_test
+
+      expect(response.response_data).not_to be_empty
+      expect(response.amount).to eq(amount.to_s)
+
+      expect(response.post_params).to include(
+        brq_amount: amount,
+        brq_culture: options[:culture],
+        brq_currency: options[:currency],
+        brq_description: options[:description],
+        brq_invoicenumber: options[:invoicenumber],
+        brq_payment_method: options[:payment_method],
+        brq_return: options[:return]
+      )
+    end
+
+    it "still works with empty response" do
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response.response_data).to be_empty
+      expect(response.success?).to be(false)
+      expect(response.statuscode).to be_nil
+    end
+
+    it "still works with crappy response" do
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response.response_data).to eq('this is a very nasty response')
+      expect(response.success?).to be(false)
+      expect(response.statuscode).to be_nil
     end
   end
 
-  context "setup recurring" do
-
-    before do
-      @secretkey  = "secretkey"
-      @websitekey = "websitekey"
-      @gateway    = ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway.new( {
-        secretkey:  @secretkey,
-        websitekey: @websitekey
-      } )
-
-      @amount               = 1.23
-      @currency             = "EUR"
-      @description          = "Description"
-      @invoicenumber        = "2013-0001"
-      @originaltransaction  = "AAAABBBB"
-      @payment_method       = "mastercard"
+  context "when setup recurring" do
+    let(:amount) { 1.23 }
+    let(:options) do
+      {
+        currency: "EUR",
+        description: "Description",
+        invoicenumber: "2013-0001",
+        originaltransaction: "AAAABBBB",
+        payment_method: "mastercard"
+      }
     end
 
-    context "ArgumentErrors" do
+    it "raises an ArumentError when currency is not EUR, GBP or USD" do
+      options[:currency] = "MYCURR"
 
-      it "should raise an ArumentError when currency is not EUR, GBP or USD" do
-        @currency = "MYCURR"
-
-        lambda {
-          @gateway.recurring(@amount, nil, {
-            currency:             @currency,
-            description:          @description,
-            invoicenumber:        @invoicenumber,
-            originaltransaction:  @originaltransaction,
-            payment_method:       @payment_method,
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string length of description is more than 40" do
-        @description = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
-
-        lambda {
-          @gateway.recurring(@amount, nil, {
-            currency:             @currency,
-            description:          @description,
-            invoicenumber:        @invoicenumber,
-            originaltransaction:  @originaltransaction,
-            payment_method:       @payment_method,
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string length of invoicenumber is more than 40" do
-        @invoicenumber = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
-
-        lambda {
-          @gateway.recurring(@amount, nil, {
-            currency:             @currency,
-            description:          @description,
-            invoicenumber:        @invoicenumber,
-            originaltransaction:  @originaltransaction,
-            payment_method:       @payment_method,
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string originaltransaction is not present" do
-        lambda {
-          @gateway.recurring(@amount, nil, {
-            currency:             @currency,
-            description:          @description,
-            invoicenumber:        @invoicenumber,
-            payment_method:       @payment_method,
-          }) }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string payment_method is not equal to mastercard or visa" do
-        @payment_method = "myowncreditcard"
-
-        lambda {
-          @gateway.recurring(@amount, nil, {
-            currency:             @currency,
-            description:          @description,
-            invoicenumber:        @invoicenumber,
-            originaltransaction:  @originaltransaction,
-            payment_method:       @payment_method,
-          }) }.should raise_error(ArgumentError)
-      end
-
+      expect { gateway.recurring(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should also work with visa cards" do
+    it "raises an ArumentError when string length of description is more than 40" do
+      options[:description] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
-      @payment_method = "visa"
-
-      @response = @gateway.recurring(@amount, nil, {
-        currency:             @currency,
-        description:          @description,
-        invoicenumber:        @invoicenumber,
-        originaltransaction:  @originaltransaction,
-        payment_method:       @payment_method,
-      })
-      @response.post_params[:brq_payment_method].should == "visa"
+      expect { gateway.recurring(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should create a new recurring via the Buckaroo API" do
+    it "raises an ArumentError when string length of invoicenumber is more than 40" do
+      options[:invoicenumber] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return('BRQ_AMOUNT=1.23&BRQ_APIRESULT=Success&BRQ_CURRENCY=EUR&BRQ_INVOICENUMBER=2013-0001&BRQ_PAYMENT=89E1B0F2793C22C0B62EE0F8E971AD21&BRQ_PAYMENT_METHOD=mastercard&BRQ_SERVICE_MASTERCARD_CARDNUMBERENDING=1111&BRQ_STATUSCODE=190&BRQ_STATUSCODE_DETAIL=S001&BRQ_STATUSMESSAGE=Payment+successfully+processed&BRQ_TEST=false&BRQ_TIMESTAMP=2013-06-14+14%3a59%3a36&BRQ_TRANSACTIONS=AABKKKE5810949444B92F51A4CAH8HDD&BRQ_SIGNATURE=b5956d4a3304218437cd15c85b539fa37420c56a')
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.recurring(@amount, nil, {
-        currency:             @currency,
-        description:          @description,
-        invoicenumber:        @invoicenumber,
-        originaltransaction:  @originaltransaction,
-        payment_method:       @payment_method,
-      })
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.invoicenumber.should == @invoicenumber
-      @response.success?.should == true
-      @response.statuscode.should == "190"
-      @response.test?.should == false
-
-      @response.response_data.should_not == ""
-      @response.amount.should == @amount.to_s
-
-      @response.post_params.should_not == nil
-      @response.post_params[:brq_amount].should == @amount
-      @response.post_params[:brq_currency].should == @currency
-      @response.post_params[:brq_description].should == @description
-      @response.post_params[:brq_invoicenumber].should == @invoicenumber
-      @response.post_params[:brq_originaltransaction].should == @originaltransaction
-      @response.post_params[:brq_payment_method].should == @payment_method
+      expect { gateway.recurring(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should still work with empty response" do
+    it "raises an ArumentError when string originaltransaction is not present" do
+      options.except!(:originaltransaction)
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return("")
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.recurring(@amount, nil, {
-        currency:             @currency,
-        description:          @description,
-        invoicenumber:        @invoicenumber,
-        originaltransaction:  @originaltransaction,
-        payment_method:       @payment_method,
-      })
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.response_data.should == ""
-      @response.success?.should == false
-      @response.statuscode.should == nil
+      expect { gateway.recurring(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should still work with crappy response" do
+    it "raises an ArumentError when string payment_method is not equal to mastercard or visa" do
+      options[:payment_method] = "myowncreditcard"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return("this is a very nasty response")
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.recurring(@amount, nil, {
-        currency:             @currency,
-        description:          @description,
-        invoicenumber:        @invoicenumber,
-        originaltransaction:  @originaltransaction,
-        payment_method:       @payment_method,
-      })
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.response_data.should == "this is a very nasty response"
-      @response.success?.should == false
-      @response.statuscode.should == nil
+      expect { gateway.recurring(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
+    it "also works with visa cards" do
+      options[:payment_method] = "visa"
+
+      response = gateway.recurring(amount, nil, options)
+      expect(response.post_params[:brq_payment_method]).to eq("visa")
+    end
+
+    it "creates a new recurring via the Buckaroo API" do
+      response = gateway.recurring(amount, nil, options)
+
+      expect(response.invoicenumber).to eq(options[:invoicenumber])
+      expect(response).to be_success
+      expect(response.statuscode).to eq("190")
+      expect(response).not_to be_test
+
+      expect(response.response_data).not_to be_empty
+      expect(response.amount).to eq(amount.to_s)
+
+      expect(response.post_params).to include(
+        brq_amount: amount,
+        brq_currency: options[:currency],
+        brq_description: options[:description],
+        brq_invoicenumber: options[:invoicenumber],
+        brq_originaltransaction: options[:originaltransaction],
+        brq_payment_method: options[:payment_method]
+      )
+    end
+
+    it "still works with empty response" do
+      response = gateway.recurring(amount, nil, options)
+
+      expect(response.response_data).to be_empty
+      expect(response.success?).to be(false)
+      expect(response.statuscode).to be_nil
+    end
+
+    it "still works with crappy response" do
+      response = gateway.recurring(amount, nil, options)
+
+      expect(response.response_data).to eq('this is a very nasty response')
+      expect(response.success?).to be(false)
+      expect(response.statuscode).to be_nil
+    end
   end
-
 end

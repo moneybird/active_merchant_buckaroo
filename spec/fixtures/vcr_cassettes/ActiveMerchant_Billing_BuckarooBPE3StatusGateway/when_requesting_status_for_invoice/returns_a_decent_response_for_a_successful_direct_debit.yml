@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://checkout.buckaroo.nl/nvp/?op=InvoiceInfo
+    body:
+      encoding: ASCII-8BIT
+      string: brq_invoicenumber=2013-0001&brq_websitekey=<WEBSITEKEY>&brq_signature=4759bd83091714905a6d8856b6f6ce67c70905b6
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Aug 2020 11:48:18 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '16763'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=d2b9df88c68ce291ea4ca3f124bbc665f1597837696; expires=Fri, 18-Sep-20
+        11:48:16 GMT; path=/; domain=.buckaroo.nl; HttpOnly; SameSite=Lax; Secure
+      Cache-Control:
+      - private
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Request-Id:
+      - 04a82576ae0000fa18aa171200000001
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 5c53a5044f25fa18-AMS
+    body:
+      encoding: ASCII-8BIT
+      string: BRQ_APIRESULT=Success&BRQ_INVOICE_1_CREDITMANAGEMENT=False&BRQ_INVOICE_1_NUMBER=2013-0001&BRQ_INVOICE_1_TEST=False&BRQ_INVOICE_1_TRANSACTIONS_1_AMOUNTDEBIT=10&BRQ_INVOICE_1_TRANSACTIONS_1_AMOUNTREFUNDABLE=10&BRQ_INVOICE_1_TRANSACTIONS_1_CREATEDDATETIME=2013-07-03+14%3a24%3a17&BRQ_INVOICE_1_TRANSACTIONS_1_CURRENCY=EUR&BRQ_INVOICE_1_TRANSACTIONS_1_DESCRIPTION=MoneyBird+account&BRQ_INVOICE_1_TRANSACTIONS_1_ID=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&BRQ_INVOICE_1_TRANSACTIONS_1_STATUS_CODE=190&BRQ_INVOICE_1_TRANSACTIONS_1_STATUS_DATETIME=2013-07-05+08%3a38%3a33&BRQ_INVOICE_1_TRANSACTIONS_1_STATUS_MESSAGE=Success&BRQ_INVOICE_1_TRANSACTIONS_1_STATUS_SUCCESS=True&BRQ_INVOICE_1_TRANSACTIONS_1_TEST=False&BRQ_INVOICE_1_TRANSACTIONS_1_TYPE=C003&BRQ_INVOICE_1_TRANSACTIONS_1_TYPEDESCRIPTION=Doorlopende+machtiging&BRQ_SIGNATURE=a0aae9107843478186eed12bc87c2970ce52868e
+  recorded_at: Wed, 19 Aug 2020 11:48:18 GMT
+recorded_with: VCR 6.0.0

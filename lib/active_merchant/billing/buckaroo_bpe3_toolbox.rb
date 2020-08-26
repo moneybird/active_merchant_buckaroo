@@ -34,7 +34,7 @@ module ActiveMerchant
       end
 
       def self.sort_hash(params)
-        params.sort_by { |f| f.first.downcase }
+        params.sort_by { |f| f.first.downcase.to_s.split('_') }
       end
 
       def self.hash_to_downcase_keys(the_hash)

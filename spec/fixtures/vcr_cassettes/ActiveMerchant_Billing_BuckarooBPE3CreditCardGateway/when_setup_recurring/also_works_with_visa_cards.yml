@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://checkout.buckaroo.nl/nvp/?op=TransactionRequest
+    body:
+      encoding: ASCII-8BIT
+      string: brq_amount=1.23&brq_currency=EUR&brq_description=Description&brq_invoicenumber=2013-0001&brq_originaltransaction=AAAABBBB&brq_payment_method=visa&brq_websitekey=<WEBSITEKEY>&brq_service_visa_action=PayRecurrent&brq_signature=9c91beb3f0ad6205666b2c5856757d9dfbf3dba0
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Aug 2020 09:00:11 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '517'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=d7bb50b587633b0fa7f7e83c5b1a2b44b1597827610; expires=Fri, 18-Sep-20
+        09:00:10 GMT; path=/; domain=.buckaroo.nl; HttpOnly; SameSite=Lax; Secure
+      Cache-Control:
+      - private
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Request-Id:
+      - 04a78b91340000bf8ce5895200000001
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 5c52aec85904bf8c-AMS
+    body:
+      encoding: ASCII-8BIT
+      string: BRQ_AMOUNT=1.23&BRQ_APIRESULT=Fail&BRQ_CURRENCY=EUR&BRQ_DESCRIPTION=Description&BRQ_INVOICENUMBER=2013-0001&BRQ_PAYMENT=39A1E096DB6C4396B8B2D0E394F07455&BRQ_RECURRING=True&BRQ_STATUSCODE=490&BRQ_STATUSCODE_DETAIL=S106&BRQ_STATUSMESSAGE=Invalid+parameter%3a+originaltransaction&BRQ_TEST=false&BRQ_TIMESTAMP=2020-08-19+11%3a00%3a10&BRQ_TRANSACTIONS=25AB0B137AA0427A9A43ABC500679CA7&BRQ_WEBSITEKEY=<WEBSITEKEY>&BRQ_SIGNATURE=a08d470727043ce4b151846bfd42ab52b391b984
+  recorded_at: Wed, 19 Aug 2020 09:00:11 GMT
+recorded_with: VCR 6.0.0

@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://checkout.buckaroo.nl/nvp/?op=TransactionRequest
+    body:
+      encoding: ASCII-8BIT
+      string: brq_amount=1.23&brq_culture=EN&brq_currency=EUR&brq_description=Description&brq_invoicenumber=2013-0001&brq_payment_method=visa&brq_startrecurrent=false&brq_websitekey=<WEBSITEKEY>&brq_return=http%3A%2F%2Flocalhost%2Freturnurl&brq_service_visa_action=Pay&brq_signature=4aff0494dc2f5b63689c47c6676805157139fa71
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Aug 2020 09:00:11 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '562'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=d6e2a0901f1d418b78d30425a7409e5521597827611; expires=Fri, 18-Sep-20
+        09:00:11 GMT; path=/; domain=.buckaroo.nl; HttpOnly; SameSite=Lax; Secure
+      Cache-Control:
+      - private
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Request-Id:
+      - 04a78b93bc00000c01f7a24200000001
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 5c52aecc6e9b0c01-AMS
+    body:
+      encoding: ASCII-8BIT
+      string: BRQ_ACTIONREQUIRED=redirect&BRQ_AMOUNT=1.23&BRQ_APIRESULT=ActionRequired&BRQ_CURRENCY=EUR&BRQ_DESCRIPTION=Description&BRQ_INVOICENUMBER=2013-0001&BRQ_MUTATIONTYPE=NotSet&BRQ_REDIRECTURL=https%3a%2f%2fcheckout.buckaroo.nl%2fhtml%2fredirect.ashx%3fr%3d47E0A02DC53A4BB19F0EB63D55367D8E&BRQ_STATUSCODE=790&BRQ_STATUSMESSAGE=Pending+input&BRQ_TEST=false&BRQ_TIMESTAMP=2020-08-19+11%3a00%3a11&BRQ_TRANSACTIONS=53623333A8FE499C957F1C1EC2D92727&BRQ_WEBSITEKEY=<WEBSITEKEY>&BRQ_SIGNATURE=be395e2dc1fbbd7ab3f6a4395ffd7be159d7310e
+  recorded_at: Wed, 19 Aug 2020 09:00:11 GMT
+recorded_with: VCR 6.0.0

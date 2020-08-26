@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://checkout.buckaroo.nl/nvp/?op=TransactionRequest
+    body:
+      encoding: ASCII-8BIT
+      string: brq_amount=1.23&brq_channel=CALLCENTER&brq_culture=EN&brq_currency=EUR&brq_description=Description&brq_invoicenumber=2013-0001&brq_payment_method=simplesepadirectdebit&brq_service_simplesepadirectdebit_action=Pay&brq_service_simplesepadirectdebit_collectdate=2020-08-19&brq_service_simplesepadirectdebit_customeraccountname=Berend&brq_service_simplesepadirectdebit_customerbic=INGBNL2A&brq_service_simplesepadirectdebit_customeriban=NL20INGB0001234567&brq_service_simplesepadirectdebit_mandatedate=2020-08-19&brq_service_simplesepadirectdebit_mandatereference=000-TEST-000001&brq_startrecurrent=true&brq_websitekey=<WEBSITEKEY>&brq_signature=5194732e0f7485a8c59a41a022d0210ba208de39
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Aug 2020 11:24:26 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '214'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=d2fd4eb1c2c687769d938e87eda395ec41597836266; expires=Fri, 18-Sep-20
+        11:24:26 GMT; path=/; domain=.buckaroo.nl; HttpOnly; SameSite=Lax; Secure
+      Cache-Control:
+      - private
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Request-Id:
+      - 04a80fa3f40000c795e228c200000001
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 5c5382198916c795-AMS
+    body:
+      encoding: ASCII-8BIT
+      string: BRQ_AMOUNT=1.23&BRQ_APIRESULT=Pending&BRQ_CURRENCY=EUR&BRQ_CUSTOMER_NAME=Berend&BRQ_INVOICENUMBER=2013-0001&BRQ_PAYMENT=1234567890ABCDEFGHIJKLMNOPQRSTUV&BRQ_PAYMENT_METHOD=SimpleSepaDirectDebit&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_COLLECTDATE=2013-12-23&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_CUSTOMERBIC=INGBNL2A&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_CUSTOMERIBAN=NL20INGB0001234567&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_MANDATEDATE=2013-12-12&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_MANDATEREFERENCE=000-TEST-000001&BRQ_STARTRECURRENT=True&BRQ_STATUSCODE=791&BRQ_STATUSCODE_DETAIL=C620&BRQ_STATUSMESSAGE=Awaiting+transfer+to+bank.&BRQ_TEST=false&BRQ_TIMESTAMP=2013-12-11+11%3a42%3a14&BRQ_TRANSACTIONS=1234567890ABCDEFGHIJKLMNOPQRSTUV&BRQ_WEBSITEKEY=<WEBSITEKEY>&BRQ_SIGNATURE=548374c1e5590dfc75dcbd3a197678ef027da7a4
+  recorded_at: Wed, 19 Aug 2020 11:24:26 GMT
+recorded_with: VCR 6.0.0

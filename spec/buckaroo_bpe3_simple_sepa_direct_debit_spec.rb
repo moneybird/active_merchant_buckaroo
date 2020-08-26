@@ -1,245 +1,162 @@
+# frozen_string_literal: true
 
-require "spec_helper.rb"
+require "spec_helper"
 
-describe "Buckaroo Simple SEPA Direct Debit implementation for ActiveMerchant" do
-
-  it "should create a new billing gateway with a required merchantid and secretkey" do
-    ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: "1234", websitekey: "1234", sepa_mandate_prefix: "000" }).should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway)
+describe ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway, :vcr do
+  let(:secretkey) { ENV['BUCKAROO_SECRET_KEY'] }
+  let(:websitekey) { ENV['BUCKAROO_WEBSITE_KEY'] }
+  let(:gateway) do
+    described_class.new(
+      secretkey: secretkey,
+      websitekey: websitekey,
+      sepa_mandate_prefix: "000"
+    )
   end
 
-  it "should throw an error if a gateway is created without merchantid or secretkey" do
-    lambda {
-      ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: "1234" })
-    }.should raise_error(ArgumentError)
+  it "creates a new billing gateway with a required websitekey and secretkey" do
+    expect(
+      described_class.new(secretkey: "1234", websitekey: "1234", sepa_mandate_prefix: "000")
+    ).to be_kind_of(described_class)
   end
 
-  it "should throw an error if a gateway is created without merchantid or secretkey" do
-    lambda {
-      ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ websitekey: "1234" })
-    }.should raise_error(ArgumentError)
+  it "throws an error if a gateway is created without website key" do
+    expect { described_class.new(secretkey: "1234") }.to raise_error(ArgumentError)
   end
 
-  context "setup purchase" do
+  it "throws an error if a gateway is created without secret key" do
+    expect { described_class.new(websitekey: "1234") }.to raise_error(ArgumentError)
+  end
 
-    before do
-      @secretkey  = "secretkey"
-      @websitekey = "websitekey"
-      @sepa_mandate_prefix = "000"
-      @gateway    = ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: @secretkey, websitekey: @websitekey, sepa_mandate_prefix: @sepa_mandate_prefix })
-
-      @amount               = 1.23
-      @collectdate          = Date.today
-      @customeraccountname  = "Berend"
-      @customerbic          = "INGBNL2A"
-      @customeriban         = "NL20INGB0001234567"
-      @description          = "Description"
-      @invoicenumber        = "2013-0001"
-      @mandatedate          = Date.today
-      @mandatereference     = "TEST-000001"
-
-      @params = {
-        collectdate: @collectdate,
-        customeraccountname: @customeraccountname,
-        customerbic: @customerbic,
-        customeriban: @customeriban,
-        description: @description,
-        invoicenumber: @invoicenumber,
-        mandatedate: @mandatedate,
-        mandatereference: @mandatereference
+  context "when setup purchase" do
+    let(:amount) { 1.23 }
+    let(:options) do
+      {
+        collectdate: Date.today,
+        customeraccountname: "Berend",
+        customerbic: "INGBNL2A",
+        customeriban: "NL20INGB0001234567",
+        description: "Description",
+        invoicenumber: "2013-0001",
+        mandatedate: Date.today,
+        mandatereference: "TEST-000001"
       }
     end
 
-    context "ArgumentErrors" do
-
-      it "should have no ArumentErrors with default params" do
-        lambda {
-          @gateway.purchase(@amount, nil, @params)
-        }.should_not raise_error
-      end
-
-      it "should raise an ArumentError when money is <= 0" do
-        @amount = -1
-
-        lambda {
-          @gateway.purchase(@amount, nil, @params)
-        }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when collectdate is not a date" do
-        @params[:collectdate] = "2013-12-16"
-
-        lambda {
-          @gateway.purchase(@amount, nil, @params)
-        }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string length of customeraccountname is more than 40" do
-        @params[:customeraccountname] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
-
-        lambda {
-          @gateway.purchase(@amount, nil, @params)
-        }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when mandatedate is not a date" do
-        @params[:mandatedate] = "2013-12-16"
-
-        lambda {
-          @gateway.purchase(@amount, nil, @params)
-        }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string length of description is more than 40" do
-        @params[:description] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
-
-        lambda {
-          @gateway.purchase(@amount, nil, @params)
-        }.should raise_error(ArgumentError)
-      end
-
-      it "should raise an ArumentError when string length of invoicenumber is more than 40" do
-        @params[:invoicenumber] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
-
-        lambda {
-          @gateway.purchase(@amount, nil, @params)
-        }.should raise_error(ArgumentError)
-      end
-
+    it "returns with no ArumentErrors with default options" do
+      expect { gateway.purchase(amount, nil, options) }.not_to raise_error
     end
 
-    context "sepa mandate prefix" do
-      it "should be compatible with old situation - buckaroo sepa prefix in mandatereference" do
-        http_mock = double(Net::HTTP)
-        http_mock.should_receive(:read_timeout=).once.with(300)
-        http_mock.should_receive(:use_ssl=).once.with(true)
-        Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
+    it "raises an ArumentError when money is <= 0" do
+      amount = -1
 
-        response_mock = double(Net::HTTPResponse)
-        response_mock.should_receive(:body).and_return('')
-        http_mock.should_receive(:post).and_return(response_mock)
-
-        @gateway = ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: @secretkey, websitekey: @websitekey })
-        @params[:mandatereference] = "000-TEST-000003"
-        @response = @gateway.purchase(@amount, nil, @params)
-
-        @response.post_params.should_not be_nil
-        @response.post_params[:brq_service_simplesepadirectdebit_mandatereference].should == "000-TEST-000003"
-      end
-
-      it "should be compatible with new situation - buckaroo sepa prefix as gateway argument" do
-        http_mock = double(Net::HTTP)
-        http_mock.should_receive(:read_timeout=).once.with(300)
-        http_mock.should_receive(:use_ssl=).once.with(true)
-        Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-        response_mock = double(Net::HTTPResponse)
-        response_mock.should_receive(:body).and_return('')
-        http_mock.should_receive(:post).and_return(response_mock)
-
-        @gateway = ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway.new({ secretkey: @secretkey, websitekey: @websitekey, sepa_mandate_prefix: "000" })
-        @params[:mandatereference] = "TEST-000004"
-        @response = @gateway.purchase(@amount, nil, @params)
-
-        @response.post_params.should_not be_nil
-        @response.post_params[:brq_service_simplesepadirectdebit_mandatereference].should == "000-TEST-000004"
-      end
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should create a new purchase via the Buckaroo API" do
+    it "raises an ArumentError when collectdate is not a date" do
+      options[:collectdate] = "2013-12-16"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return('BRQ_AMOUNT=1.23&BRQ_APIRESULT=Pending&BRQ_CURRENCY=EUR&BRQ_CUSTOMER_NAME=Berend&BRQ_INVOICENUMBER=2013-0001&BRQ_PAYMENT=1234567890ABCDEFGHIJKLMNOPQRSTUV&BRQ_PAYMENT_METHOD=SimpleSepaDirectDebit&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_COLLECTDATE=2013-12-23&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_CUSTOMERBIC=INGBNL2A&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_CUSTOMERIBAN=NL20INGB0001234567&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_MANDATEDATE=2013-12-12&BRQ_SERVICE_SIMPLESEPADIRECTDEBIT_MANDATEREFERENCE=000-TEST-000001&BRQ_STARTRECURRENT=True&BRQ_STATUSCODE=791&BRQ_STATUSCODE_DETAIL=C620&BRQ_STATUSMESSAGE=Awaiting+transfer+to+bank.&BRQ_TEST=false&BRQ_TIMESTAMP=2013-12-11+11%3a42%3a14&BRQ_TRANSACTIONS=1234567890ABCDEFGHIJKLMNOPQRSTUV&BRQ_WEBSITEKEY=XXXX&BRQ_SIGNATURE=299bf41ccf0fd71ff50811a6bba76cd189a3c9c6')
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.purchase(@amount, nil, @params)
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.response_data.should_not == ""
-      @response.success?.should be_truthy
-      @response.test?.should be_falsey
-      @response.statuscode.should == "791"
-      @response.amount.should == @amount.to_s
-      @response.invoicenumber.should == @invoicenumber
-      @response.simplesepadirectdebit_collectdate.should == "2013-12-23"
-      @response.simplesepadirectdebit_mandatereference.should == "000-TEST-000001"
-
-      @response.post_params.should_not be_nil
-      @response.post_params[:brq_amount].should == @amount
-      @response.post_params[:brq_channel].should == "CALLCENTER"
-      @response.post_params[:brq_description].should == @description
-      @response.post_params[:brq_invoicenumber].should == @invoicenumber
-      @response.post_params[:brq_payment_method].should == "simplesepadirectdebit"
-      @response.post_params[:brq_service_simplesepadirectdebit_customeraccountname].should == @customeraccountname
-      @response.post_params[:brq_service_simplesepadirectdebit_customerbic].should == @customerbic
-      @response.post_params[:brq_service_simplesepadirectdebit_customeriban].should == @customeriban
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should handle an error with wrong IBAN number the right way" do
+    it "raises an ArumentError when string length of customeraccountname is more than 40" do
+      options[:customeraccountname] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return('BRQ_AMOUNT=1.23&BRQ_APIERRORMESSAGE=Parameter+%22CustomerIBAN%22+has+wrong+value&BRQ_CURRENCY=EUR&BRQ_INVOICENUMBER=2013-0001&BRQ_MUTATIONTYPE=NotSet&BRQ_STATUSCODE=491&BRQ_STATUSMESSAGE=Validation+failure&BRQ_TEST=false&BRQ_TIMESTAMP=2013-12-11+13%3a33%3a26&BRQ_TRANSACTIONS=1234567890ABCDEFGHIJKLMNOPQRSTUV&BRQ_WEBSITEKEY=XXXX&BRQ_SIGNATURE=2a99f87909ce3418a770c9964b16975e73ca84d3')
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.purchase(@amount, nil, @params)
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.response_data.should_not == ""
-      @response.success?.should be_falsey
-      @response.test?.should be_falsey
-      @response.statuscode.should == "491"
-      @response.amount.should == @amount.to_s
-      @response.invoicenumber.should == @invoicenumber
-
-      @response.response_params.should_not be_nil
-      @response.response_params["brq_apierrormessage"].should == 'Parameter "CustomerIBAN" has wrong value'
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should still work with empty response" do
+    it "raises an ArumentError when mandatedate is not a date" do
+      options[:mandatedate] = "2013-12-16"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
-
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return("")
-      http_mock.should_receive(:post).and_return(response_mock)
-
-      @response = @gateway.purchase(@amount, nil, @params)
-
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.success?.should be_falsey
-      @response.statuscode.should be_nil
-      @response.response_data.should == ""
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
     end
 
-    it "should still work with crappy response" do
+    it "raises an ArumentError when string length of description is more than 40" do
+      options[:description] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
-      http_mock = double(Net::HTTP)
-      http_mock.should_receive(:read_timeout=).once.with(300)
-      http_mock.should_receive(:use_ssl=).once.with(true)
-      Net::HTTP.should_receive(:new).with("checkout.buckaroo.nl", 443).and_return(http_mock)
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
+    end
 
-      response_mock = double(Net::HTTPResponse)
-      response_mock.should_receive(:body).and_return("this is a very nasty response")
-      http_mock.should_receive(:post).and_return(response_mock)
+    it "raises an ArumentError when string length of invoicenumber is more than 40" do
+      options[:invoicenumber] = "AAAAABBBBBCCCCCDDDDDAAAAABBBBBCCCCCDDDDDE"
 
-      @response = @gateway.purchase(@amount, nil, @params)
+      expect { gateway.purchase(amount, nil, options) }.to raise_error(ArgumentError)
+    end
 
-      @response.should be_kind_of(ActiveMerchant::Billing::BuckarooBPE3Response)
-      @response.success?.should be_falsey
-      @response.statuscode.should be_nil
-      @response.response_data.should == "this is a very nasty response"
+    it "supports sepa mandate prefix in mandatereference (old situation)" do
+      gateway = described_class.new({ secretkey: secretkey, websitekey: websitekey })
+      options[:mandatereference] = "000-TEST-000003"
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response.post_params).not_to be_nil
+      expect(
+        response.post_params[:brq_service_simplesepadirectdebit_mandatereference]
+      ).to eq("000-TEST-000003")
+    end
+
+    it "supports sepa mandate prefix as gateway argument (new situation)" do
+      options[:mandatereference] = "TEST-000004"
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response.post_params).not_to be_nil
+      expect(
+        response.post_params[:brq_service_simplesepadirectdebit_mandatereference]
+      ).to eq("000-TEST-000004")
+    end
+
+    it "creates a new purchase via the Buckaroo API" do
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response.response_data).not_to be_empty
+      expect(response).to be_success
+      expect(response).not_to be_test
+      expect(response.statuscode).to eq("791")
+      expect(response.amount).to eq(amount.to_s)
+      expect(response.invoicenumber).to eq(options[:invoicenumber])
+      expect(response.simplesepadirectdebit_collectdate).to eq("2013-12-23")
+      expect(response.simplesepadirectdebit_mandatereference).to eq("000-TEST-000001")
+
+      expect(response.post_params).to include(
+        brq_amount: amount,
+        brq_channel: "CALLCENTER",
+        brq_description: options[:description],
+        brq_invoicenumber: options[:invoicenumber],
+        brq_payment_method: "simplesepadirectdebit",
+        brq_service_simplesepadirectdebit_customeraccountname: options[:customeraccountname],
+        brq_service_simplesepadirectdebit_customerbic: options[:customerbic],
+        brq_service_simplesepadirectdebit_customeriban: options[:customeriban]
+      )
+    end
+
+    it "handles an error with wrong IBAN number the right way" do
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response.response_data).not_to be_empty
+      expect(response).not_to be_success
+      expect(response).not_to be_test
+      expect(response.statuscode).to eq("491")
+      expect(response.amount).to eq(amount.to_s)
+      expect(response.invoicenumber).to eq(options[:invoicenumber])
+
+      expect(response.post_params).not_to be_nil
+      expect(
+        response.response_params["brq_apierrormessage"]
+      ).to eq('Parameter "CustomerIBAN" has wrong value')
+    end
+
+    it "still works with empty response" do
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response).not_to be_success
+      expect(response.statuscode).to be_nil
+      expect(response.response_data).to be_empty
+    end
+
+    it "still works with crappy response" do
+      response = gateway.purchase(amount, nil, options)
+
+      expect(response).not_to be_success
+      expect(response.statuscode).to be_nil
+      expect(response.response_data).to eq("this is a very nasty response")
     end
   end
 end

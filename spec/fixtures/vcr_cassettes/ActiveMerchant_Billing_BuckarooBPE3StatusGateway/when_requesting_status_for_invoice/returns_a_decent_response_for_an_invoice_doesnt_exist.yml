@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://checkout.buckaroo.nl/nvp/?op=InvoiceInfo
+    body:
+      encoding: ASCII-8BIT
+      string: brq_invoicenumber=2013-0001&brq_websitekey=<WEBSITEKEY>&brq_signature=4759bd83091714905a6d8856b6f6ce67c70905b6
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 19 Aug 2020 11:48:23 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '16763'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=df0bd2fb3033da5db5724385333aa61201597837701; expires=Fri, 18-Sep-20
+        11:48:21 GMT; path=/; domain=.buckaroo.nl; HttpOnly; SameSite=Lax; Secure
+      Cache-Control:
+      - private
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Request-Id:
+      - 04a8258b4100000c65eb886200000001
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 5c53a5253bd90c65-AMS
+    body:
+      encoding: ASCII-8BIT
+      string: BRQ_APIRESULT=Success&BRQ_INVALIDINVOICE_1_ERRORMESSAGE=Invoice+could+not+be+found&BRQ_INVALIDINVOICE_1_NUMBER=2013-0001&BRQ_SIGNATURE=87ac701597b169c22f09f601b82b3658855a6e6b
+  recorded_at: Wed, 19 Aug 2020 11:48:23 GMT
+recorded_with: VCR 6.0.0

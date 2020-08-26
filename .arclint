@@ -1,0 +1,26 @@
+{
+  "linters": {
+    "chmod": {
+      "type": "chmod"
+    },
+    "json": {
+      "type": "json",
+      "include": "(\\.json$)"
+    },
+    "merge-conflict": {
+      "type": "merge-conflict"
+    },
+    "ruby": {
+      "type": "rubocop",
+      "flags": ["-S"],
+      "include": "(\\.(rb|rake)$)",
+      "severity": {
+        "convention": "advice",
+        "fatal": "error"
+      }
+    },
+    "spelling": {
+      "type": "spelling"
+    }
+  }
+}

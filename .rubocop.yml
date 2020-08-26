@@ -1,0 +1,230 @@
+require:
+  - rubocop-rspec
+  - rubocop-performance
+
+AllCops:
+  NewCops: enable
+
+Rails:
+  Enabled: true
+
+Lint/Debugger:
+  Severity: error
+
+Lint/EmptyEnsure:
+  Severity: error
+
+Security/Eval:
+  Severity: error
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: true
+  Exclude:
+    - 'spec/**/*'
+
+Lint/LiteralInInterpolation:
+  Enabled: true
+
+Lint/RescueException:
+  Severity: error
+
+Lint/UnreachableCode:
+  Severity: error
+
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+Lint/UselessAssignment:
+  Severity: error
+
+Metrics/AbcSize:
+  Severity: refactor
+
+Metrics/BlockLength:
+  Severity: refactor
+  Exclude:
+    - 'Guardfile'
+    - 'Gemfile'
+    - 'db/migrate/*'
+    - 'spec/**/*'
+
+Metrics/BlockNesting:
+  Severity: refactor
+
+Metrics/ClassLength:
+  Severity: refactor
+
+Metrics/ModuleLength:
+  Severity: refactor
+
+Metrics/CyclomaticComplexity:
+  Severity: refactor
+
+Layout/LineLength:
+  Severity: convention
+  Max: 100
+  Exclude:
+    - 'db/migrate/*'
+
+Metrics/MethodLength:
+  Severity: convention
+
+Metrics/ParameterLists:
+  Severity: refactor
+  Exclude:
+    - 'app/jobs/**/*'
+
+Metrics/PerceivedComplexity:
+  Severity: refactor
+
+Performance/CaseWhenSplat:
+  Severity: warning
+
+Performance/Count:
+  Severity: warning
+
+Performance/Detect:
+  Severity: warning
+
+Performance/FixedSize:
+  Severity: warning
+
+Performance/FlatMap:
+  Severity: warning
+
+Performance/RangeInclude:
+  Severity: warning
+
+Performance/ReverseEach:
+  Severity: warning
+
+Style/Sample:
+  Severity: warning
+
+Performance/Size:
+  Severity: warning
+
+Performance/StringReplacement:
+  Severity: warning
+
+RSpec/ContextWording:
+  Prefixes:
+    - when
+    - with
+    - without
+    - if
+  Exclude:
+    - 'spec/api/**/*'
+
+RSpec/DescribeClass:
+  Severity: warning
+  Exclude:
+    - 'spec/db/**/*'
+    - 'spec/integrations/**/*'
+    - 'spec/test_helpers/**/*'
+
+RSpec/ExpectActual:
+  Exclude:
+    - 'spec/db/elasticsearch/*_analyzer_spec.rb'
+
+RSpec/MultipleDescribes:
+  Severity: warning
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/Focus:
+  Enabled: true
+  Severity: error
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/SharedExamples:
+  Enabled: false
+
+Capybara/FeatureMethods:
+  Enabled: false
+
+Style/AndOr:
+  Severity: warning
+
+Style/ClassCheck:
+  EnforcedStyle: kind_of?
+
+Style/CollectionMethods:
+  Enabled: true
+
+Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
+  Severity: error
+
+Layout/ElseAlignment:
+  Severity: warning
+
+Style/EmptyElse:
+  Severity: convention
+
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+
+Style/GlobalVars:
+  Severity: warning
+
+Style/HashSyntax:
+  Severity: error
+
+Style/MissingElse:
+  Enabled: true
+  EnforcedStyle: case
+  Severity: convention
+
+Style/MutableConstant:
+  Enabled: false # doesn't always work
+  Severity: warning
+
+Style/NumericLiterals:
+  Enabled: false
+
+Style/OptionHash:
+  Enabled: true
+
+Style/PerlBackrefs:
+  Severity: warning
+
+Layout/SpaceAroundEqualsInParameterDefault:
+  EnforcedStyle: no_space
+
+Layout/SpaceBeforeBlockBraces:
+  Enabled: false
+
+Layout/SpaceInsideBlockBraces:
+  Enabled: true
+  SpaceBeforeBlockParameters: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/StringMethods:
+  Enabled: true
+
+Style/SymbolArray:
+  Enabled: true
+
+Style/SymbolProc:
+  Severity: warning
+  AutoCorrect: false
+
+Style/UnlessElse:
+  Severity: warning
+
+Style/RedundantInterpolation:
+  Severity: warning

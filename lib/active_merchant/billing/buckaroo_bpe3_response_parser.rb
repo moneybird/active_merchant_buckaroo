@@ -18,6 +18,10 @@ module ActiveMerchant #:nodoc:
         @response_params = ActiveMerchant::Billing::BuckarooBPE3Toolbox.hash_to_downcase_keys(@response_params)
       end
 
+      def additional_variables
+        response_params.select {|k, *| k.to_s.start_with?("add_") }
+      end
+
       def amount
         response_params["brq_amount"] || (-1 * BigDecimal(response_params["brq_amount_credit"])).to_s
       end

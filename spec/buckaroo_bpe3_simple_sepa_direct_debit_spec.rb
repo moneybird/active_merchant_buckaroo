@@ -127,6 +127,19 @@ describe ActiveMerchant::Billing::BuckarooBPE3SimpleSepaDirectDebitGateway, :vcr
       )
     end
 
+    it "supports sending additional variables with request" do
+      new_options = options.merge(add_test: "someValue", add_diff: "differentValue")
+      response = gateway.purchase(amount, nil, new_options)
+
+      expect(response).to be_success
+      expect(response).not_to be_test
+      expect(response.statuscode).to eq("791")
+      expect(response.additional_variables).to eq(
+        "add_test" => new_options[:add_test],
+        "add_diff" => new_options[:add_diff]
+      )
+    end
+
     it "handles an error with wrong IBAN number the right way" do
       response = gateway.purchase(amount, nil, options)
 

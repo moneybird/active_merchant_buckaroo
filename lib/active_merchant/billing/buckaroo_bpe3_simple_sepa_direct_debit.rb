@@ -51,7 +51,7 @@ module ActiveMerchant
           brq_service_simplesepadirectdebit_mandatereference: mandatereference,
           brq_startrecurrent: true,
           brq_websitekey: @options[:websitekey]
-        }
+        }.merge(options.select {|k, *| k.to_s.start_with?("add_") })
 
         BuckarooBPE3Toolbox.call("TransactionRequest", post_params, @options[:secretkey], true)
       end

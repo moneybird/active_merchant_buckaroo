@@ -99,6 +99,21 @@ describe ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway, :vcr do
       )
     end
 
+    it "supports sending additional variables with request" do
+      new_options = options.merge(add_test: "someValue", add_diff: "differentValue")
+      response = gateway.purchase(amount, nil, new_options)
+
+      expect(response).to be_success
+      expect(response.statuscode).to eq("790")
+      expect(response).not_to be_test
+
+      expect(response.response_data).not_to be_empty
+      expect(response.additional_variables).to eq(
+        "add_test" => new_options[:add_test],
+        "add_diff" => new_options[:add_diff]
+      )
+    end
+
     it "still works with empty response" do
       response = gateway.purchase(amount, nil, options)
 
@@ -183,6 +198,21 @@ describe ActiveMerchant::Billing::BuckarooBPE3CreditCardGateway, :vcr do
         brq_invoicenumber: options[:invoicenumber],
         brq_originaltransaction: options[:originaltransaction],
         brq_payment_method: options[:payment_method]
+      )
+    end
+
+    it "supports sending additional variables with request" do
+      new_options = options.merge(add_test: "someValue", add_diff: "differentValue")
+      response = gateway.recurring(amount, nil, new_options)
+
+      expect(response).to be_success
+      expect(response.statuscode).to eq("190")
+      expect(response).not_to be_test
+
+      expect(response.response_data).not_to be_empty
+      expect(response.additional_variables).to eq(
+        "add_test" => new_options[:add_test],
+        "add_diff" => new_options[:add_diff]
       )
     end
 

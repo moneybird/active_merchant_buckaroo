@@ -80,7 +80,7 @@ module ActiveMerchant
           brq_payment_method: options[:payment_method],
           brq_startrecurrent: options[:startrecurring] ? "true" : "false",
           brq_websitekey: @options[:websitekey]
-        }
+        }.merge(options.select {|k, *| k.to_s.start_with?("add_") })
         post_params[:brq_return] = options[:return] if options[:return]
         post_params
       end

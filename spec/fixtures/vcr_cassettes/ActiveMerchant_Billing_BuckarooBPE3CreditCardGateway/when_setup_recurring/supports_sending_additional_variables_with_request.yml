@@ -1,0 +1,56 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://checkout.buckaroo.nl/nvp/?op=TransactionRequest
+    body:
+      encoding: ASCII-8BIT
+      string: brq_amount=1.23&brq_currency=EUR&brq_description=Description&brq_invoicenumber=2013-0001&brq_payment_method=mastercard&brq_startrecurrent=false&brq_websitekey=<WEBSITEKEY>&add_test=someValue&add_diff=differentValue&brq_originaltransaction=AAAABBBB&brq_service_mastercard_action=PayRecurrent&brq_signature=8e335b712221178cbdd13dd009fb527d0a97d83b
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Wed, 26 Aug 2020 11:39:51 GMT
+      Content-Type:
+      - text/plain; charset=utf-8
+      Content-Length:
+      - '543'
+      Connection:
+      - keep-alive
+      Set-Cookie:
+      - __cfduid=d7760b09c0c7fe3b353f8284236fc70b41598441991; expires=Fri, 25-Sep-20
+        11:39:51 GMT; path=/; domain=.buckaroo.nl; HttpOnly; SameSite=Lax; Secure
+      Cache-Control:
+      - private
+      Vary:
+      - Accept-Encoding
+      X-Robots-Tag:
+      - noindex, nofollow
+      Cf-Cache-Status:
+      - DYNAMIC
+      Cf-Request-Id:
+      - 04cc2a45470000d8c9ffa33200000001
+      Expect-Ct:
+      - max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+      Strict-Transport-Security:
+      - max-age=15552000; preload
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - 5c8d464edd0fd8c9-AMS
+    body:
+      encoding: ASCII-8BIT
+      string: ADD_DIFF=differentValue&ADD_TEST=someValue&BRQ_AMOUNT=1.23&BRQ_APIRESULT=Success&BRQ_CURRENCY=EUR&BRQ_INVOICENUMBER=2013-0001&BRQ_PAYMENT=89E1B0F2793C22C0B62EE0F8E971AD21&BRQ_PAYMENT_METHOD=mastercard&BRQ_SERVICE_MASTERCARD_CARDNUMBERENDING=1111&BRQ_STATUSCODE=190&BRQ_STATUSCODE_DETAIL=S001&BRQ_STATUSMESSAGE=Payment+successfully+processed&BRQ_TEST=false&BRQ_TIMESTAMP=2013-06-14+14%3a59%3a36&BRQ_TRANSACTIONS=AABKKKE5810949444B92F51A4CAH8HDD&BRQ_SIGNATURE=ea78be3645ea229ad26f53cff5aac1ebaf181eb4
+  recorded_at: Wed, 26 Aug 2020 11:39:51 GMT
+recorded_with: VCR 6.0.0

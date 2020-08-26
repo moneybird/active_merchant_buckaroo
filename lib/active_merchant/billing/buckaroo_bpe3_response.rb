@@ -23,6 +23,10 @@ module ActiveMerchant #:nodoc:
         response_parser.response_params
       end
 
+      def additional_variables
+        response_parser.additional_variables
+      end
+
       def simplesepadirectdebit_collectdate
         response_parser.simplesepadirectdebit_collectdate
       end

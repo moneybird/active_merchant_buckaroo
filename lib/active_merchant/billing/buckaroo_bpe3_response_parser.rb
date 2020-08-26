@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     class BuckarooBPE3ResponseParser
+      attr_reader :response_data, :response_params
 
       def initialize(response_data, secretkey)
         if response_data.kind_of?(String)
@@ -14,15 +17,6 @@ module ActiveMerchant #:nodoc:
         # make sure all string keys in hash are downcase
         @response_params = ActiveMerchant::Billing::BuckarooBPE3Toolbox.hash_to_downcase_keys(@response_params)
       end
-
-      def response_data
-        @response_data
-      end
-
-      def response_params
-        @response_params
-      end
-
 
       def amount
         response_params["brq_amount"] || (-1 * BigDecimal(response_params["brq_amount_credit"])).to_s
@@ -125,9 +119,8 @@ module ActiveMerchant #:nodoc:
         response_params["brq_transactions"]
       end
 
-
       def apiresult_success?
-        apiresult.downcase == "success"
+        apiresult.casecmp("success").zero?
       end
 
       def creditcard?
@@ -136,16 +129,16 @@ module ActiveMerchant #:nodoc:
 
       def directdebit?
         # Only for BuckarooBPE3Push, not for BuckarooBPE3Response
-        transaction_type.upcase == "C002"
+        transaction_type.casecmp("C002").zero?
       end
 
       def directdebitrecurring?
         # Only for BuckarooBPE3Push, not for BuckarooBPE3Response
-        transaction_type.upcase == "C003"
+        transaction_type.casecmp("C003").zero?
       end
 
       def failure?
-        [ "490", "491", "492", "690", "890", "891" ].include?(statuscode)
+        %w[490 491 492 690 890 891].include?(statuscode)
       end
 
       def iban_converter_success?
@@ -153,11 +146,11 @@ module ActiveMerchant #:nodoc:
       end
 
       def mastercard?
-        transaction_type.upcase == "V043"
+        transaction_type.casecmp("V043").zero?
       end
 
       def pending?
-        [ "790", "791", "792", "793" ].include?(statuscode)
+        %w[790 791 792 793].include?(statuscode)
       end
 
       def reversal?
@@ -165,7 +158,7 @@ module ActiveMerchant #:nodoc:
         # C501 for simplesepadirectdebit storno
         # C502 for simplesepadirectdebit reject
         # C562 is for directdebit
-        ["C501", "C502", "C562"].include?(transaction_type.upcase)
+        %w[C501 C502 C562].include?(transaction_type.upcase)
       end
 
       def signature_valid?
@@ -173,19 +166,19 @@ module ActiveMerchant #:nodoc:
       end
 
       def simplesepadirectdebit?
-        transaction_type.upcase == "C008"
+        transaction_type.casecmp("C008").zero?
       end
 
       def success?
-        statuscode == "190"
+        statuscode ? statuscode == "190" : apiresult.casecmp("success").zero?
       end
 
       def test?
-        test.downcase == "true"
+        test.casecmp("true").zero?
       end
 
       def transfer?
-        transaction_type.upcase == "C001" || transaction_type.upcase == "C101"
+        transaction_type.casecmp("C001").zero? || transaction_type.casecmp("C101").zero?
       end
 
       def valid?
@@ -193,11 +186,8 @@ module ActiveMerchant #:nodoc:
       end
 
       def visa?
-        transaction_type.upcase == "V044"
+        transaction_type.casecmp("V044").zero?
       end
-
     end
-
   end
-
 end

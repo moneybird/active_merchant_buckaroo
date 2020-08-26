@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     class BuckarooBPE3Response < Response
-
       def post_data
         @params["post_data"]
       end
@@ -42,7 +43,6 @@ module ActiveMerchant #:nodoc:
         response_parser.transactions
       end
 
-
       def amount
         response_parser.amount
       end
@@ -79,12 +79,11 @@ module ActiveMerchant #:nodoc:
         response_parser.test?
       end
 
-
       # bpe3 status
       def status_amount_credit
         amount = BigDecimal("0")
         1.upto(99) do |i|
-          str = sprintf("brq_invoice_1_transactions_%d_amountcredit", i)
+          str = format("brq_invoice_1_transactions_%<index>d_amountcredit", index: i)
           amount += BigDecimal(response_params[str]) if response_params[str]
         end
         amount
@@ -93,9 +92,9 @@ module ActiveMerchant #:nodoc:
       def status_amount_debit
         amount = BigDecimal("0")
         1.upto(99) do |i|
-          str1 = sprintf("brq_invoice_1_transactions_%d_amountdebit", i)
-          str2 = sprintf("brq_invoice_1_transactions_%d_status_success", i)
-          if response_params[str1] and response_params[str2] and response_params[str2].downcase == "true"
+          str1 = format("brq_invoice_1_transactions_%<index>d_amountdebit", index: i)
+          str2 = format("brq_invoice_1_transactions_%<index>d_status_success", index: i)
+          if response_params[str1] && response_params[str2] && response_params[str2].casecmp("true").zero?
             amount += BigDecimal(response_params[str1])
           end
         end
@@ -113,9 +112,6 @@ module ActiveMerchant #:nodoc:
       def status_paid?
         status_amount_paid == status_amount_invoice
       end
-
     end
-
   end
-
 end
